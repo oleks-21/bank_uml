@@ -11,6 +11,8 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Link from "@mui/material/Link";
+import { useNavigate } from 'react-router-dom';
+
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -36,6 +38,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
     },
 }));
 export function Login() {
+    const navigate = useNavigate();
     return (
         <div>
             <Card id="login-card">
@@ -52,7 +55,7 @@ export function Login() {
                     type="password"
                     autoComplete="current-password"
                 />
-                <Button variant="contained">Login</Button>
+                <Button variant="contained" onClick={() => navigate('/account', { state: { accountType: 'user' } })}>Login</Button>
                 <Link href="register" underline="none" style={{ marginLeft: "1em" }}>
                     {"Don't have an account?"}
                 </Link>
@@ -80,7 +83,7 @@ export function Login() {
                             autoComplete="current-password"
                             sx={{ width: "100%", marginTop: "1em" }}
                         />
-                        <Button variant="contained" sx={{ width: "100%", marginTop: "1em" }}>Login</Button>
+                        <Button variant="contained" sx={{ width: "100%", marginTop: "1em" }} onClick={() => navigate('/account', { state: { accountType: 'staff' } })}>Login</Button>
                     </AccordionDetails>
                 </StyledAccordion>
 
