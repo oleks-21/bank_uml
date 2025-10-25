@@ -1,11 +1,32 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { Grid, Box, Card } from "@mui/material";
 import { SideBar } from "../SideBar/SideBar";
-
+import {Profile} from "../Profile/Profile"
+import { AccountsList } from "../AccountsList/AccountsList";
+import { TransactionHistory } from "../TransactionHistory/TransactionHistory";
+import { SearchModule } from "../SearchModule/SearchModule";
 export function AccountPage() {
     const location = useLocation();
-    const accountType = location.state?.accountType || "user"; // fallback
+    const accountType = location.state?.accountType || "user";
+    const [selectedMenuItem, setSelectedMenuItem] = useState("My Profile");
+    const renderContent = () => {
+        switch (selectedMenuItem) {
+            case "My Profile":
+                return <Profile/>;
+            case "Accounts":
+                return <><SearchModule/><AccountsList/></>;
+            case "Transaction History":
+                return <><SearchModule/><TransactionHistory/></>;
+            case "Customer Accounts":
+                return <p>Manage customer accounts here.</p>;
+            case "Pending Transactions":
+                return <p>Review and approve pending transactions here.</p>;
+            default:
+                return <p>Select an option from the sidebar.</p>;
+        }
+    };
 
     return (
         <Box
@@ -15,27 +36,25 @@ export function AccountPage() {
         >
             <Grid
                 container
-                spacing={4}
             >
                 <Grid size={{ xs: 12, sm: 4 }}>
-                    <SideBar accountType={accountType} />
+                    <SideBar accountType={accountType}
+                        onMenuSelect={setSelectedMenuItem}
+                        selectedMenuItem={selectedMenuItem}
+                    />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 8 }}>
                     <Card
                         sx={{
                             height: "100%",
-                            display: "flex",
                             paddingLeft: "2em",
                             paddingRight: "2em",
                             alignItems: "center",
-                            justifyContent: "center",
                         }}
                     >
                         <div style={{ textAlign: "center" }}>
-                            <h2>Welcome to your dashboard</h2>
-                            <p>
-                                Content will be presented here.
-                            </p>
+                            <h2>{selectedMenuItem}</h2>
+                            {renderContent()}
                         </div>
                     </Card>
                 </Grid>
