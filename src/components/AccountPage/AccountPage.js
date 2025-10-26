@@ -3,10 +3,13 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Grid, Box, Card } from "@mui/material";
 import { SideBar } from "../SideBar/SideBar";
-import {Profile} from "../Profile/Profile"
+import { Profile } from "../Profile/Profile"
 import { AccountsList } from "../AccountsList/AccountsList";
 import { TransactionHistory } from "../TransactionHistory/TransactionHistory";
 import { SearchModule } from "../SearchModule/SearchModule";
+import { CustomerAccounts } from "../CustomerAccounts/CustomerAccounts";
+import { PendingTransactions } from "../PendingTransactions/PendingTransactions";
+import { StaffAcounts } from "../StaffAccounts/StaffAccounts";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
@@ -14,15 +17,17 @@ export function AccountPage() {
     const renderContent = () => {
         switch (selectedMenuItem) {
             case "My Profile":
-                return <Profile/>;
+                return <Profile accountType={accountType} />;
             case "Accounts":
-                return <><SearchModule/><AccountsList/></>;
+                return <><SearchModule /><AccountsList accountType={accountType}/></>;
             case "Transaction History":
-                return <><SearchModule/><TransactionHistory/></>;
+                return <><SearchModule /><TransactionHistory accountType={accountType}/></>;
             case "Customer Accounts":
-                return <p>Manage customer accounts here.</p>;
+                return <><SearchModule /><CustomerAccounts accountType={accountType} /></>;
             case "Pending Transactions":
-                return <p>Review and approve pending transactions here.</p>;
+                return <><SearchModule /><PendingTransactions accountType={accountType} /></>;
+            case "Manage Staff":
+                return <><SearchModule /><StaffAcounts/></>;
             default:
                 return <p>Select an option from the sidebar.</p>;
         }
