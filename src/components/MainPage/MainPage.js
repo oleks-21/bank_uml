@@ -6,7 +6,7 @@ export function MainPage() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get("https://bankuml-backend.onrender.com/users")
+    axios.get("https://bank-uml.onrender.com/users")
 
       .then(res => setUsers(res.data))
       .catch(err => console.error(err));

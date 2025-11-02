@@ -57,14 +57,29 @@ export function Login() {
     manager: "123",
   };
 
-  const handleCustomerLogin = () => {
-    if (
-      customerCard === customerCredentials.cardNumber &&
-      customerPassword === customerCredentials.password
-    ) {
-      navigate("/account", { state: { accountType: "user" } });
-    } else {
-      alert("Invalid card number or password.");
+  const handleCustomerLogin = async () => {
+    try {
+      const response = await fetch("https://bankuml-backend.onrender.com/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cardNumber: customerCard,
+          password: customerPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        navigate("/account", { state: { accountType: "user", user: data.user } });
+      } else {
+        alert(data.message || "Invalid card number or password.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Server error. Please try again later.");
     }
   };
 
