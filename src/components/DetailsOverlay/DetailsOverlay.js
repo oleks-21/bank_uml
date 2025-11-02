@@ -43,7 +43,7 @@ export function DetailsOverlay({ title, field, onClose, accountType }) {
                         </Button>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                        {(accountType == ("teller" || "manager"))
+                        {((accountType === "teller" || accountType === "manager"))
                             &&
                             <Button
                                 variant="contained"
@@ -51,7 +51,7 @@ export function DetailsOverlay({ title, field, onClose, accountType }) {
                                 onClick={onClose}
                                 sx={{ float: "right" }}
                             >
-                                Edit
+                                Save Changes
                             </Button>
                         }
                     </Grid>

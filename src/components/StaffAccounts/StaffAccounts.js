@@ -6,6 +6,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
 export function StaffAcounts({ accountType }) {
+    console.log("accountType>>> ", accountType)
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
 

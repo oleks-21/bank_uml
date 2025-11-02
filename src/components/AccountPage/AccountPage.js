@@ -10,6 +10,7 @@ import { SearchModule } from "../SearchModule/SearchModule";
 import { CustomerAccounts } from "../CustomerAccounts/CustomerAccounts";
 import { PendingTransactions } from "../PendingTransactions/PendingTransactions";
 import { StaffAcounts } from "../StaffAccounts/StaffAccounts";
+import { ComplianceLogs } from "../ComplianceLogs/ComplianceLogs";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
@@ -19,15 +20,17 @@ export function AccountPage() {
             case "My Profile":
                 return <Profile accountType={accountType} />;
             case "Accounts":
-                return <><SearchModule /><AccountsList accountType={accountType}/></>;
+                return <><SearchModule /><AccountsList accountType={accountType} /></>;
             case "Transaction History":
-                return <><SearchModule /><TransactionHistory accountType={accountType}/></>;
+                return <><SearchModule /><TransactionHistory accountType={accountType} /></>;
             case "Customer Accounts":
                 return <><SearchModule /><CustomerAccounts accountType={accountType} /></>;
             case "Pending Transactions":
                 return <><SearchModule /><PendingTransactions accountType={accountType} /></>;
             case "Manage Staff":
-                return <><SearchModule /><StaffAcounts/></>;
+                return <><SearchModule /><StaffAcounts accountType={accountType} /></>;
+            case "Compliance Logs":
+                return <><SearchModule /><ComplianceLogs accountType={accountType} /></>;
             default:
                 return <p>Select an option from the sidebar.</p>;
         }
