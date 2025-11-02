@@ -3,10 +3,11 @@ import axios from "axios";
 
 import { Login } from "../Login/Login";
 export function MainPage() {
-    const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/users")
+    axios.get("https://bankuml-backend.onrender.com/users")
+
       .then(res => setUsers(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -18,7 +19,7 @@ export function MainPage() {
           <li key={u.customer_id}>{u.first_name} ({u.last_name})</li>
         ))}
       </ul>
-      <Login/>
+      <Login />
     </div>
   );
 }

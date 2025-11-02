@@ -3,7 +3,14 @@ import mysql from "mysql2";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
+
+// ✅ Configure CORS to allow your frontend URLs
+app.use(cors({
+  origin: ["http://localhost:3000", "https://your-firebase-app.web.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
 app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
@@ -23,14 +30,20 @@ db.connect((err) => {
   console.log("✅ Connected to AWS RDS MySQL");
 });
 
-app.get("/users", (req, res) => {
-    db.query("SELECT customer_id, first_name, last_name FROM Customer", (err, results) => {
-        if (err) {
-            console.error("Query error:", err); // <--- log the error
-            return res.status(500).send({ error: err.message });
-        }
-        res.send(results);
-    });
+// ✅ Add a root endpoint for Render health check
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running!");
 });
 
-app.listen(PORT, () => console.log("Server running on port 3001"));
+// ✅ Your users route
+app.get("/users", (req, res) => {
+  db.query("SELECT customer_id, first_name, last_name FROM Customer", (err, results) => {
+    if (err) {
+      console.error("Query error:", err);
+      return res.status(500).send({ error: err.message });
+    }
+    res.send(results);
+  });
+});
+
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
