@@ -20,7 +20,7 @@ export function Profile({ accountType }) {
         return <Typography>Loading profile...</Typography>;
     }
 
-    const fields =[];
+    let fields =[];
         switch (accountType) {
         case "user":
             fields = [
@@ -89,7 +89,7 @@ export function Profile({ accountType }) {
             <Stack spacing={2}>
                 {fields.map((field) => (
                     <Grid key={field.label} container alignItems="center" spacing={2}>
-                        <Grid item xs={4}>
+                        <Grid item xs={4} width="100px">
                             <Typography variant="body1" sx={{ float: "left" }}>
                                 {field.label}:
                             </Typography>

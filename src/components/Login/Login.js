@@ -83,13 +83,32 @@ export function Login() {
     }
   };
 
-  const handleStaffLogin = () => {
-    if (staffCredentials[staffUsername] && staffPassword === staffCredentials[staffUsername]) {
-      navigate("/account", { state: { accountType: staffUsername } });
-    } else {
-      alert("Invalid staff username or password.");
+  const handleStaffLogin = async () => {
+    try {
+      const response = await fetch("https://bank-uml.onrender.com/login-worker", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: staffUsername,
+          password: staffPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        navigate("/account", { state: { accountType: data.user.role, user: data.user } });
+      } else {
+        alert(data.message || "Invalid staff email or password.");
+      }
+    } catch (error) {
+      console.error("Staff login error:", error);
+      alert("Server error. Please try again later.");
     }
   };
+
 
   return (
     <div>
