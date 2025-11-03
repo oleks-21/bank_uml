@@ -59,7 +59,7 @@ export function Login() {
 
   const handleCustomerLogin = async () => {
     try {
-      const response = await fetch("https://bankuml-backend.onrender.com/login", {
+      const response = await fetch("https://bank-uml.onrender.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

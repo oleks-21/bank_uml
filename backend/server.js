@@ -6,7 +6,7 @@ const app = express();
 
 // ✅ Configure CORS to allow your frontend URLs
 app.use(cors({
-  origin: ["http://localhost:3000", "https://your-firebase-app.web.app"],
+  origin: ["http://localhost:3000", "https://bankuml.web.app/"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -34,15 +34,29 @@ app.get("/", (req, res) => {
   res.send("✅ Backend is running!");
 });
 
-app.get("/users", (req, res) => {
-  db.query("SELECT customer_id, first_name, last_name FROM Customer", (err, results) => {
+app.get("/user/:id", (req, res) => {
+  const { id } = req.params;
+
+  const query = `
+    SELECT first_name, last_name, email, date_of_birth, country, province, city, street, postal_code
+    FROM Customer
+    WHERE customer_id = ?
+  `;
+
+  db.query(query, [id], (err, results) => {
     if (err) {
-      console.error("Query error:", err);
-      return res.status(500).send({ error: err.message });
+      console.error("Fetch user data error:", err);
+      return res.status(500).json({ message: "Internal server error" });
     }
-    res.send(results);
+
+    if (results.length > 0) {
+      return res.json(results[0]);
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
   });
 });
+
 
 app.post("/login", (req, res) => {
   const { cardNumber, password } = req.body;
@@ -74,4 +88,4 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.listen(PORT,"0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
