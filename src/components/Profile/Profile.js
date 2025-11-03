@@ -13,76 +13,31 @@ export function Profile({ accountType }) {
                 .then((res) => res.json())
                 .then((data) => setUserData(data))
                 .catch((err) => console.error("Failed to fetch user profile:", err));
+        } else if (user?.worker_id) {
+            fetch(`https://bank-uml.onrender.com/worker/${user.worker_id}`)
+                .then((res) => res.json())
+                .then((data) => setUserData(data))
+                .catch((err) => console.error("Failed to fetch worker profile:", err));
         }
     }, [accountType, user]);
 
-    if (accountType === "user" && !userData) {
+    if (!userData) {
         return <Typography>Loading profile...</Typography>;
     }
 
-    let fields =[];
-        switch (accountType) {
-        case "user":
-            fields = [
-                { label: "First Name", value: userData.first_name },
-                { label: "Last Name", value: userData.last_name },
-                { label: "Email", value: userData.email },
-                { label: "Date of Birth", value: userData.date_of_birth },
-                { label: "Country", value: userData.country },
-                { label: "Province", value: userData.province },
-                { label: "City", value: userData.city },
-                { label: "Address", value: `${userData.street} ${userData.postal_code}` },
-            ];
-            break;
-        case "teller":
-            fields = [
-                { label: "First Name", value: "Teller" },
-                { label: "Last Name", value: "Doe" },
-                { label: "Email", value: "teller.doe@gmail.com" },
-                { label: "Date of Birth", value: "1992-06-02" },
-                { label: "Country", value: "Canada" },
-                { label: "Province", value: "Ontario" },
-                { label: "City", value: "Hamilton" },
-                { label: "Address", value: "292 Bremner Boulevard M5V 3L9" },
-            ];
-            break;
-        case "auditor":
-            fields = [
-                { label: "First Name", value: "Auditor" },
-                { label: "Last Name", value: "Doe" },
-                { label: "Email", value: "auditor.doe@gmail.com" },
-                { label: "Date of Birth", value: "1990-02-11" },
-                { label: "Country", value: "Canada" },
-                { label: "Province", value: "Ontario" },
-                { label: "City", value: "Kingston" },
-                { label: "Address", value: "190 Bremner Boulevard M5V 3L9" },
-            ];
-            break;
-        case "manager":
-            fields = [
-                { label: "First Name", value: "Manager" },
-                { label: "Last Name", value: "Doe" },
-                { label: "Email", value: "manager.doe@gmail.com" },
-                { label: "Date of Birth", value: "1980-01-14" },
-                { label: "Country", value: "Canada" },
-                { label: "Province", value: "Ontario" },
-                { label: "City", value: "Kitchner" },
-                { label: "Address", value: "300 Bremner Boulevard M5V 3L9" },
-            ];
-            break;
-        default:
-            fields = [
-                { label: "First Name", value: "John" },
-                { label: "Last Name", value: "Doe" },
-                { label: "Email", value: "john.doe@gmail.com" },
-                { label: "Date of Birth", value: "1994-03-14" },
-                { label: "Country", value: "Canada" },
-                { label: "Province", value: "Ontario" },
-                { label: "City", value: "Toronto" },
-                { label: "Address", value: "290 Bremner Boulevard M5V 3L9" },
-            ];
-            break;
-    }
+    const fields = [
+        { label: "First Name", value: userData.first_name },
+        { label: "Last Name", value: userData.last_name },
+        { label: "Email", value: userData.email },
+        ...(accountType !== "user"
+            ? [{ label: "Role", value: userData.role }]
+            : []),
+        { label: "Date of Birth", value: userData.date_of_birth },
+        { label: "Country", value: userData.country },
+        { label: "Province", value: userData.province },
+        { label: "City", value: userData.city },
+        { label: "Address", value: `${userData.street} ${userData.postal_code}` },
+    ];
 
     return (
         <Card sx={{ p: 3, maxWidth: 600, mx: "auto" }}>

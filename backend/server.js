@@ -4,7 +4,6 @@ import cors from "cors";
 
 const app = express();
 
-// ✅ Allow frontend origins
 app.use(cors({
   origin: ["http://localhost:3000", "https://bankuml.web.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -52,7 +51,6 @@ app.get("/user/:id", (req, res) => {
   });
 });
 
-// ✅ Fetch worker by ID
 app.get("/worker/:id", (req, res) => {
   const { id } = req.params;
   const query = `
@@ -69,7 +67,6 @@ app.get("/worker/:id", (req, res) => {
   });
 });
 
-// ✅ Customer login
 app.post("/login", (req, res) => {
   const { cardNumber, password } = req.body;
 
@@ -97,7 +94,6 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ✅ Worker login
 app.post("/login-worker", (req, res) => {
   const { email, password } = req.body;
 
@@ -124,5 +120,67 @@ app.post("/login-worker", (req, res) => {
     }
   });
 });
+
+app.post("/register", (req, res) => {
+  const {
+    first_name,
+    last_name,
+    email,
+    date_of_birth,
+    country,
+    province,
+    city,
+    street,
+    postal_code,
+    document_1,
+    document_2,
+    password,
+  } = req.body;
+
+  const primary_card_number = Math.floor(1e15 + Math.random() * 9e15);
+
+  if (!first_name || !last_name || !email || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const query = `
+    INSERT INTO Customer 
+    (first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, document_1, document_2, password, primary_card_number)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    query,
+    [
+      first_name,
+      last_name,
+      email,
+      date_of_birth,
+      country,
+      province,
+      city,
+      street,
+      postal_code,
+      document_1 || null,
+      document_2 || null,
+      password,
+      primary_card_number,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("❌ Registration error:", err);
+        return res.status(500).json({ message: "Failed to register user" });
+      }
+
+      res.json({
+        success: true,
+        message: "User registered successfully",
+        customer_id: result.insertId,
+        card_number: primary_card_number,
+      });
+    }
+  );
+});
+
 
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
