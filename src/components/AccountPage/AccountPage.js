@@ -12,7 +12,7 @@ import { PendingTransactions } from "../PendingTransactions/PendingTransactions"
 import { StaffAcounts } from "../StaffAccounts/StaffAccounts";
 import { ComplianceLogs } from "../ComplianceLogs/ComplianceLogs";
 import { Transfer } from "../Transfer/Transfer";
-
+import { TransferHistory } from "../TransferHistory/TransferHistory";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
@@ -31,6 +31,8 @@ export function AccountPage() {
                 return <><SearchModule /><CustomerAccounts accountType={accountType} /></>;
             case "Pending Transactions":
                 return <><SearchModule /><PendingTransactions accountType={accountType} /></>;
+            case "Pending Transfers":
+                return <><SearchModule /><TransferHistory accountType={accountType} /></>;
             case "Manage Staff":
                 return <><SearchModule /><StaffAcounts accountType={accountType} /></>;
             case "Compliance Logs":

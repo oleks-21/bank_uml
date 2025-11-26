@@ -14,7 +14,7 @@ export function SideBar({ accountType, onMenuSelect, selectedMenuItem }) {
 
   switch (accountType) {
     case "teller":
-      menuItems = ["My Profile", "Customer Accounts", "Pending Transactions"];
+      menuItems = ["My Profile", "Customer Accounts", "Pending Transactions", "Pending Transfers"];
       break;
     case "auditor":
       menuItems = ["My Profile", "Customer Accounts", "Compliance Logs"];
@@ -24,12 +24,13 @@ export function SideBar({ accountType, onMenuSelect, selectedMenuItem }) {
         "My Profile",
         "Customer Accounts",
         "Pending Transactions",
+        "Pending Transfers",
         "Manage Staff",
       ];
       break;
     case "user":
     default:
-      menuItems = ["My Profile", "Accounts", "Transaction History", "Make a Transfer"];
+      menuItems = ["My Profile", "Accounts", "Transaction History", "Transfer History", "Make a Transfer"];
       break;
   }
   return (
