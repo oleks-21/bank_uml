@@ -327,4 +327,65 @@ app.get('/pending-transfers', (req, res) => {
   });
 });
 
+// Transfer funds between accounts
+app.post('/transfer', async (req, res) => {
+  const { from, to, amount } = req.body;
+  if (!from || !to || !amount || isNaN(amount)) {
+    return res.status(400).json({ message: 'Missing or invalid transfer data.' });
+  }
+
+  // Helper to run queries as promises
+  const queryAsync = (query, params) => new Promise((resolve, reject) => {
+    db.query(query, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+
+  try {
+    // 1. Get sender and recipient accounts
+    const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [from]);
+    const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [to]);
+    if (!sender || !recipient) {
+      return res.status(404).json({ message: 'Sender or recipient account not found.' });
+    }
+
+    // 2. Check frozen status for both customers
+    const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.customer_id]);
+    const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.customer_id]);
+    if (!senderCustomer || !recipientCustomer) {
+      return res.status(404).json({ message: 'Sender or recipient customer not found.' });
+    }
+    if (senderCustomer.frozen || recipientCustomer.frozen) {
+      return res.status(403).json({ message: 'Sender or recipient account is frozen.' });
+    }
+
+    // 3. Check for pending transfer for either card
+    const pendingTransfers = await queryAsync('SELECT * FROM Transfer WHERE (card_number_from = ? OR card_number_to = ?) AND pending = 1', [from, to]);
+    if (pendingTransfers.length > 0) {
+      return res.status(409).json({ message: 'There is already a pending transfer for one of the accounts.' });
+    }
+
+    // 4. Check sufficient funds
+    if (sender.balance < amount) {
+      return res.status(400).json({ message: 'Insufficient funds.' });
+    }
+
+    // 5. Insert transfer
+    let pending = amount >= 1000 ? 1 : 0;
+    await queryAsync('INSERT INTO Transfer (card_number_from, card_number_to, amount, pending) VALUES (?, ?, ?, ?)', [from, to, amount, pending]);
+
+    // 6. If not pending, update balances
+    if (pending === 0) {
+      await queryAsync('UPDATE Account SET balance = balance - ? WHERE card_number = ?', [amount, from]);
+      await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [amount, to]);
+    }
+
+    res.json({ success: true, pending: !!pending });
+  } catch (err) {
+    console.error('❌ Transfer error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
