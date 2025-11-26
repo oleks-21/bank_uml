@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import { Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -8,11 +7,28 @@ import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 export function PendingTransactions({ accountType }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
-    const fields = [
-        { labelName: "Full Name: ", valueName: "John Doe", labelCard: "Card Number: ", valueCard: "4503 3244 1122 4134", labelTransaction: "Transaction Amount: ", valueTransaction: "5043$", labelEmail: "Email: ", valueEmail: "john.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1994-03-14", labelAddress: "Address: ", value: "Canada Ontario, Toronto 290 Bremner Boulevard M5V 3L9" },
-        { labelName: "Full Name: ", valueName: "Jane Doe", labelCard: "Card Number: ", valueCard: "1234 4542 2311 1234", labelTransaction: "Transaction Amount: ", valueTransaction: "250$", labelEmail: "Email: ", valueEmail: "jane.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1993-07-12", labelAddress: "Address: ", value: "Canada Quebec, Montreal 123 Saint-Catherine DFG 3R5" },
-        { labelName: "Full Name: ", valueName: "Bill Doe", labelCard: "Card Number: ", valueCard: "3255 3524 9887 3310", labelTransaction: "Transaction Amount: ", valueTransaction: "20$", labelEmail: "Email: ", valueEmail: "bill.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1978-04-30", labelAddress: "Address: ", value: "Canada Ontario, Toronto 295 Bremner Boulevard M6V 3L9" },
-    ]
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+        const fetchTransactions = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${baseUrl}/pending-transactions`);
+                if (!res.ok) throw new Error(`Failed to fetch transactions: ${res.status}`);
+                const data = await res.json();
+                setTransactions(data);
+            } catch (err) {
+                setError(err.message || 'Unknown error');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTransactions();
+    }, []);
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -26,25 +42,41 @@ export function PendingTransactions({ accountType }) {
     return (
         <>
             <Stack>
-                {fields.map((field) => (
-
-                    <Card sx={{ width: "100%", marginBottom: "2em" }}>
-                        <Grid container>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                <h4 style={{ textAlign: "start" }}>{field.labelCard + field.valueCard}</h4>
-                                <h5 style={{ textAlign: "start" }}>{field.labelTransaction + field.valueTransaction}</h5>
+                {loading && <p>Loading pending transactions...</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {!loading && !error && transactions.map((field, idx) => {
+                    // Map database row fields to UI-friendly values
+                    const displayField = {
+                        ...field,
+                        labelName: "Full Name: ",
+                        valueName: field.full_name || field.name || '',
+                        labelCard: "Card Number: ",
+                        valueCard: field.card_number || field.account_number || '',
+                        labelTransaction: "Transaction Amount: ",
+                        valueTransaction: field.amount ? `${field.amount}$` : '',
+                        labelEmail: "Email: ",
+                        valueEmail: field.email || '',
+                        labelDate: "Date of Birth: ",
+                        valueDate: field.date_of_birth || '',
+                        labelAddress: "Address: ",
+                        value: field.address || '',
+                    };
+                    return (
+                        <Card key={field.transaction_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
+                            <Grid container>
+                                <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
+                                    <h4 style={{ textAlign: "start" }}>{displayField.labelCard + displayField.valueCard}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{displayField.labelTransaction + displayField.valueTransaction}</h5>
+                                </Grid>
+                                <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
+                                    <Button endIcon={<ArrowForwardIosIcon />}
+                                        onClick={() => handleOpen(displayField)}>View Details
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
-                                <Button endIcon={<ArrowForwardIosIcon />}
-                                    onClick={() => handleOpen(field)}>View Details
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                ))}
-
-
-
+                        </Card>
+                    );
+                })}
             </Stack>
             <Modal open={open} onClose={handleClose}>
                 <Box

@@ -272,4 +272,16 @@ app.get("/transactions/:customerId", (req, res) => {
   });
 });
 
+// Fetch all pending transactions
+app.get('/pending-transactions', (req, res) => {
+  const query = `SELECT * FROM Transaction WHERE pending_status = 1`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('❌ Fetch pending transactions error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
