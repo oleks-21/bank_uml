@@ -274,7 +274,7 @@ app.get("/transactions/:customerId", (req, res) => {
 
 // Fetch all pending transactions
 app.get('/pending-transactions', (req, res) => {
-  const query = `SELECT * FROM Transaction WHERE pending_status = 1`;
+  const query = `SELECT * FROM Transaction WHERE pending = 1`;
   db.query(query, (err, results) => {
     if (err) {
       console.error('❌ Fetch pending transactions error:', err);

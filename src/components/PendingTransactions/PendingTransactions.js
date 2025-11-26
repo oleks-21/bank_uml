@@ -12,7 +12,7 @@ export function PendingTransactions({ accountType }) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+        const baseUrl = "https://bank-uml.onrender.com";
         const fetchTransactions = async () => {
             try {
                 setLoading(true);
