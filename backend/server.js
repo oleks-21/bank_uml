@@ -205,6 +205,18 @@ app.get('/accounts', (req, res) => {
   });
 });
 
+// Fetch all customer profiles
+app.get('/customers', (req, res) => {
+  const query = `SELECT customer_id, first_name, last_name, email, date_of_birth, country, province, city, street, postal_code FROM Customer`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('❌ Fetch customers error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
 // Update customer profile fields
 app.patch('/user/:id', (req, res) => {
   const { id } = req.params;

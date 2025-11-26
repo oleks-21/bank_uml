@@ -16,7 +16,7 @@ export function TransactionHistory() {
     useEffect(() => {
         if (!user?.customer_id) return;
 
-        fetch(`https://bankuml-backend.onrender.com/transactions/${user.customer_id}`)
+        fetch(`https://bank-uml.onrender.com/transactions/${user.customer_id}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log("Fetched transactions:", data);
@@ -46,18 +46,13 @@ export function TransactionHistory() {
                                     Amount: ${t.amount}
                                 </h4>
                                 <h5 style={{ textAlign: "start" }}>
-                                    Card: {t.card_number}
+                                    Card Number: {t.card_number}
                                 </h5>
                             </Grid>
 
                             <Grid 
                                 xs={6} 
-                                sx={{ 
-                                    display: "flex", 
-                                    justifyContent: "center", 
-                                    alignItems: "center", 
-                                    pr: 2 
-                                }}
+                                sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}
                             >
                                 <Button
                                     endIcon={<ArrowForwardIosIcon />}

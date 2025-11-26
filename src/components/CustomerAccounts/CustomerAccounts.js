@@ -1,17 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Stack, Grid, Card, Button, Box, Modal } from "@mui/material";
-import { useState } from "react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
+
 export function CustomerAccounts({ accountType }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const fields = [
-        { labelName: "Full Name: ", valueName: "John Doe", labelEmail: "Email: ", valueEmail: "john.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1994-03-14", labelAddress: "Address: ", valueAddress: "Canada Ontario, Toronto 290 Bremner Boulevard M5V 3L9" },
-        { labelName: "Full Name: ", valueName: "Jane Doe", labelEmail: "Email: ", valueEmail: "jane.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1993-07-12", labelAddress: "Address: ", valueAddress: "Canada Quebec, Montreal 123 Saint-Catherine DFG 3R5" },
-        { labelName: "Full Name: ", valueName: "Bill Doe", labelEmail: "Email: ", valueEmail: "bill.doe@gmail.com", labelDate: "Date of Birth: ", valueDate: "1978-04-30", labelAddress: "Address: ", valueAddress: "Canada Ontario, Toronto 295 Bremner Boulevard M6V 3L9" },
-    ]
+    useEffect(() => {
+        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+        const fetchCustomers = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${baseUrl}/customers`);
+                if (!res.ok) throw new Error(`Failed to fetch customers: ${res.status}`);
+                const data = await res.json();
+                setCustomers(data);
+            } catch (err) {
+                setError(err.message || 'Unknown error');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCustomers();
+    }, []);
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -25,24 +41,39 @@ export function CustomerAccounts({ accountType }) {
     return (
         <>
             <Stack>
-                {fields.map((field) => (
-
-                    <Card sx={{ width: "100%", marginBottom: "2em" }}>
-                        <Grid container>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                <h4 style={{ textAlign: "start" }}>{field.labelName + field.valueName}</h4>
-                                <h5 style={{ textAlign: "start" }}>{field.labelEmail + field.valueEmail}</h5>
+                {loading && <p>Loading customers...</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {!loading && !error && customers.map((field, idx) => {
+                    const fullName = `${field.first_name || ''} ${field.last_name || ''}`.trim();
+                    const address = `${field.country || ''} ${field.province || ''}, ${field.city || ''} ${field.street || ''} ${field.postal_code || ''}`.replace(/ +/g, ' ').trim();
+                    const displayField = {
+                        ...field,
+                        labelName: "Full Name: ",
+                        valueName: fullName,
+                        labelEmail: "Email: ",
+                        valueEmail: field.email || '',
+                        labelDate: "Date of Birth: ",
+                        valueDate: field.date_of_birth || '',
+                        labelAddress: "Address: ",
+                        valueAddress: address,
+                    };
+                    return (
+                        <Card key={field.customer_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
+                            <Grid container>
+                                <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
+                                    <h4 style={{ textAlign: "start" }}>{displayField.labelName + displayField.valueName}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{displayField.labelEmail + displayField.valueEmail}</h5>
+                                </Grid>
+                                <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
+                                    <Button endIcon={<ArrowForwardIosIcon />}
+                                        onClick={() => handleOpen(displayField)}
+                                    >View Details
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
-                                <Button endIcon={<ArrowForwardIosIcon />}
-                                    onClick={() => handleOpen(field)}
-                                >View Details
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                ))}
-
+                        </Card>
+                    );
+                })}
             </Stack>
             <Modal open={open} onClose={handleClose}>
                 <Box

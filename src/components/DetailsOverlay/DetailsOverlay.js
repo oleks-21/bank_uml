@@ -1,7 +1,6 @@
 import React from "react";
 import { Stack, Card, Typography, Button, Divider, Grid, TextField } from "@mui/material";
 export function DetailsOverlay({ title, field, onClose, accountType }) {
-    console.log("accountType>>> ", accountType)
     if (!field) return null;
 
     return (
