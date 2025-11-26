@@ -296,11 +296,17 @@ app.get('/pending-transactions', (req, res) => {
   });
 });
 
-// Fetch all transfers for a customer
+// Fetch all transfers for a customer (by card association)
 app.get('/transfers/:customerId', (req, res) => {
   const { customerId } = req.params;
-  const query = `SELECT * FROM Transfer WHERE customer_id = ?`;
-  db.query(query, [customerId], (err, results) => {
+  const query = `
+    SELECT t.*
+    FROM Transfer t
+    JOIN Account a_from ON t.card_number_from = a_from.card_number
+    JOIN Account a_to ON t.card_number_to = a_to.card_number
+    WHERE a_from.customer_id = ? OR a_to.customer_id = ?
+  `;
+  db.query(query, [customerId, customerId], (err, results) => {
     if (err) {
       console.error('❌ Fetch transfers error:', err);
       return res.status(500).json({ message: 'Internal server error' });

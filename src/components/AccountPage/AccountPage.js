@@ -31,7 +31,7 @@ export function AccountPage() {
                 return <><SearchModule /><CustomerAccounts accountType={accountType} /></>;
             case "Pending Transactions":
                 return <><SearchModule /><PendingTransactions accountType={accountType} /></>;
-            case "Pending Transfers":
+            case "Transfer History":
                 return <><SearchModule /><TransferHistory accountType={accountType} /></>;
             case "Manage Staff":
                 return <><SearchModule /><StaffAcounts accountType={accountType} /></>;
