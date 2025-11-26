@@ -12,7 +12,7 @@ export function AccountsList({ accountType }) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+        const baseUrl = 'https://bank-uml.onrender.com';
         const fetchAccounts = async () => {
             try {
                 setLoading(true);

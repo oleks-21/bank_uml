@@ -48,17 +48,6 @@ export function Login() {
   const [staffUsername, setStaffUsername] = useState("");
   const [staffPassword, setStaffPassword] = useState("");
 
-  const customerCredentials = {
-    cardNumber: "123",
-    password: "123",
-  };
-
-  const staffCredentials = {
-    teller: "123",
-    auditor: "123",
-    manager: "123",
-  };
-
   const handleCustomerLogin = async () => {
     try {
       const response = await fetch("https://bank-uml.onrender.com/login", {

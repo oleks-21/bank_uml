@@ -203,4 +203,31 @@ app.get('/accounts', (req, res) => {
   });
 });
 
+// Update customer profile fields
+app.patch('/user/:id', (req, res) => {
+  const { id } = req.params;
+  const allowedFields = [
+    'first_name', 'last_name', 'email', 'date_of_birth',
+    'country', 'province', 'city', 'street', 'postal_code'
+  ];
+  const updates = Object.entries(req.body)
+    .filter(([key]) => allowedFields.includes(key));
+
+  if (updates.length === 0) {
+    return res.status(400).json({ message: 'No valid fields to update.' });
+  }
+
+  const setClause = updates.map(([key]) => `${key} = ?`).join(', ');
+  const values = updates.map(([, value]) => value);
+
+  const query = `UPDATE Customer SET ${setClause} WHERE customer_id = ?`;
+  db.query(query, [...values, id], (err, result) => {
+    if (err) {
+      console.error('❌ Update customer error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json({ success: true, affectedRows: result.affectedRows });
+  });
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
