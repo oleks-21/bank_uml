@@ -1,38 +1,99 @@
-import React from "react";
+import React, { useState } from "react";
 import { Stack, Card, Typography, Button, Divider, Grid, TextField } from "@mui/material";
+
+function formatLabel(label) {
+    return label
+        .replace(/([A-Z])/g, " $1")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+        .trim();
+}
+
 export function DetailsOverlay({ title, field, onClose, accountType }) {
+    // Move hooks before any return
+    const isEditable = accountType === "teller" || accountType === "manager";
+    const [editData, setEditData] = useState(field || {});
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
     if (!field) return null;
 
+    const handleFieldChange = (key) => (e) => {
+        setEditData((prev) => ({ ...prev, [key]: e.target.value }));
+        setSaveSuccess(false);
+        setSaveError(null);
+    };
+
+    // Determine endpoint and id for PATCH/PUT
+    const getEndpoint = () => {
+        if (editData.customer_id) return [`/user/${editData.customer_id}`, "PATCH"];
+        if (editData.worker_id) return [`/worker/${editData.worker_id}`, "PATCH"];
+        if (editData.account_id) return [`/accounts/${editData.account_id}`, "PATCH"];
+        if (editData.transaction_id) return [`/transactions/${editData.transaction_id}`, "PATCH"];
+        return [null, null];
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        setSaveError(null);
+        setSaveSuccess(false);
+        const [endpoint, method] = getEndpoint();
+        if (!endpoint) {
+            setSaveError("Unknown data type for saving.");
+            setSaving(false);
+            return;
+        }
+        try {
+            const baseUrl = 'https://bank-uml.onrender.com';
+            const res = await fetch(`${baseUrl}${endpoint}`, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(editData),
+            });
+            if (!res.ok) throw new Error("Failed to save changes");
+            setSaveSuccess(true);
+        } catch (err) {
+            setSaveError(err.message || "Unknown error");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
-        <Card sx={{ p: 3, maxHeight: "70vh", overflowY: "auto"}} >
+        <Card sx={{ p: 3, maxHeight: "70vh", overflowY: "auto" }}>
             <Stack spacing={2}>
-                {/* Title Section */}
                 <Typography variant="h6" gutterBottom>
                     {title || "Details"}
                 </Typography>
-
                 <Divider />
-
-                {/* Dynamic Info Rendering */}
-                {Object.entries(field).map(([key, value]) => (
-
-                    <>
-                        {((accountType === "teller" || accountType === "manager") && (key.substring(0, 5) == "value")) ? <TextField key={key} defaultValue={value}></TextField> :
-                            <Typography key={key}>
-                                {value}
+                {Object.entries(editData).map(([key, value]) => (
+                    <Grid container alignItems="center" spacing={1} key={key}>
+                        <Grid item xs={5}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {formatLabel(key)}:
                             </Typography>
-                        }
-
-                    </>
-
-
+                        </Grid>
+                        <Grid item xs={7}>
+                            {isEditable && typeof value === "string" ? (
+                                <TextField
+                                    fullWidth
+                                    value={value}
+                                    size="small"
+                                    variant="outlined"
+                                    onChange={handleFieldChange(key)}
+                                />
+                            ) : (
+                                <Typography variant="body2">{value}</Typography>
+                            )}
+                        </Grid>
+                    </Grid>
                 ))}
-
+                {saveError && <Typography color="error">{saveError}</Typography>}
+                {saveSuccess && <Typography color="success.main">Saved!</Typography>}
                 <Divider sx={{ my: 1 }} />
-
-                {/* Close Button */}
                 <Grid container>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid item xs={6}>
                         <Button
                             variant="contained"
                             color="primary"
@@ -41,33 +102,21 @@ export function DetailsOverlay({ title, field, onClose, accountType }) {
                             Close
                         </Button>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        {((accountType === "teller" || accountType === "manager"))
-                            &&
+                    <Grid item xs={6}>
+                        {isEditable && (
                             <Button
                                 variant="contained"
                                 color="success"
-                                onClick={onClose}
+                                onClick={handleSave}
                                 sx={{ float: "right" }}
+                                disabled={saving}
                             >
-                                Save Changes
+                                {saving ? "Saving..." : "Save Changes"}
                             </Button>
-                        }
+                        )}
                     </Grid>
-
-
                 </Grid>
-
             </Stack>
         </Card>
     );
-}
-
-// Helper function to make key names more readable
-function formatLabel(label) {
-    return label
-        .replace(/([A-Z])/g, " $1") // split camelCase
-        .replace(/_/g, " ") // replace underscores
-        .replace(/\b\w/g, (c) => c.toUpperCase()) // capitalize words
-        .trim();
 }
