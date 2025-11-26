@@ -217,6 +217,18 @@ app.get('/customers', (req, res) => {
   });
 });
 
+// Fetch all staff profiles
+app.get('/workers', (req, res) => {
+  const query = `SELECT worker_id, first_name, last_name, email, role, date_of_birth, country, province, city, street, postal_code FROM Worker`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('❌ Fetch workers error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
 // Update customer profile fields
 app.patch('/user/:id', (req, res) => {
   const { id } = req.params;
