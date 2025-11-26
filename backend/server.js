@@ -244,7 +244,7 @@ app.get("/transactions/:customerId", (req, res) => {
       t.transaction_type,
       t.transaction_date,
       t.pending
-    FROM \`Transaction\` t
+    FROM Transaction t
     JOIN Account a ON t.card_number = a.card_number
     WHERE a.user_id = ?
     ORDER BY t.transaction_date DESC;
