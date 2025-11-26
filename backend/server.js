@@ -182,5 +182,25 @@ app.post("/register", (req, res) => {
   );
 });
 
+// Fetch accounts (optionally filtered by customerId)
+app.get('/accounts', (req, res) => {
+  const { customerId } = req.query;
+  let query = `SELECT * FROM Account`;
+  const params = [];
+
+  if (customerId) {
+    query += ` WHERE customer_id = ?`;
+    params.push(customerId);
+  }
+
+  db.query(query, params, (err, results) => {
+    if (err) {
+      console.error('❌ Fetch accounts error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    res.json(results);
+  });
+});
 
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));

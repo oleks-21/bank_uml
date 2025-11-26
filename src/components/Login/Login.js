@@ -11,7 +11,8 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { setUser } from "../../store/userSlice";
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -39,6 +40,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 }));
 
 export function Login() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [customerCard, setCustomerCard] = useState("");
@@ -73,6 +75,7 @@ export function Login() {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        dispatch(setUser({ user: data.user, accountType: "user" }));
         navigate("/account", { state: { accountType: "user", user: data.user } });
       } else {
         alert(data.message || "Invalid card number or password.");
@@ -97,8 +100,9 @@ export function Login() {
       });
 
       const data = await response.json();
-
       if (response.ok && data.success) {
+        dispatch(setUser({ user: data.user, accountType: data.user.role }));
+
         navigate("/account", { state: { accountType: data.user.role, user: data.user } });
       } else {
         alert(data.message || "Invalid staff email or password.");

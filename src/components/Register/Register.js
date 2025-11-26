@@ -69,7 +69,7 @@ export function Register() {
     }
 
     try {
-      const response = await fetch("https://bankuml-backend.onrender.com/register", {
+      const response = await fetch("https://bank-uml.onrender.com/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
