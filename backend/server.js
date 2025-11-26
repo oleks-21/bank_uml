@@ -296,4 +296,29 @@ app.get('/pending-transactions', (req, res) => {
   });
 });
 
+// Fetch all transfers for a customer
+app.get('/transfers/:customerId', (req, res) => {
+  const { customerId } = req.params;
+  const query = `SELECT * FROM Transfer WHERE customer_id = ?`;
+  db.query(query, [customerId], (err, results) => {
+    if (err) {
+      console.error('❌ Fetch transfers error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
+// Fetch all pending transfers
+app.get('/pending-transfers', (req, res) => {
+  const query = `SELECT * FROM Transfer WHERE pending_status = 1`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('❌ Fetch pending transfers error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
