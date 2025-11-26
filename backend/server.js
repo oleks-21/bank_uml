@@ -233,4 +233,33 @@ app.patch('/user/:id', (req, res) => {
   });
 });
 
+// Fetch transactions for a given customer
+app.get("/transactions/:customerId", (req, res) => {
+  const { customerId } = req.params;
+
+  const query = `
+    SELECT 
+      t.transaction_id,
+      t.amount,
+      t.card_number,
+      t.transaction_type,
+      t.transaction_date,
+      t.pending
+    FROM Transaction t
+    JOIN Account a ON t.card_number = a.card_number
+    WHERE a.user_id = ?
+    ORDER BY t.transaction_date DESC;
+  `;
+
+  db.query(query, [customerId], (err, results) => {
+    if (err) {
+      console.error("❌ Fetch transactions error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    res.json(results);
+  });
+});
+
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));

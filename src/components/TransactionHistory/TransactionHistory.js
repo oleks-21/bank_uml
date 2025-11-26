@@ -1,19 +1,30 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import { Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
+import { useSelector } from "react-redux";
 
-export function TransactionHistory(accountType) {
+export function TransactionHistory() {
+    const [transactions, setTransactions] = useState([]);
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const fields = [
-        { labelAmount: "Amount Paid: ", valueAmount: "1200$", labelNumber: "Card Number: ", valueNumber: "2496 0968 9621 1134", labelDate: "Date of Payment: ", valueDate: "2014-03-14", labelTime: "Time: ", value: "13:44" },
-        { labelAmount: "Amount Paid: ", valueAmount: "200$", labelNumber: "Card Number: ", valueNumber: "4567 3423 1342 3453", labelDate: "Date of Payment: ", valueDate: "2018-09-11", labelTime: "Time: ", value: "08:32" },
-        { labelAmount: "Amount Paid: ", valueAmount: "12$", labelNumber: "Card Number: ", valueNumber: "4567 3423 1342 3453", labelDate: "Date of Payment: ", valueDate: "2014-12-26", labelTime: "Time: ", value: "19:04" },
-    ]
+    const { user } = useSelector((state) => state.user);  // get logged-in user
+
+    // Fetch real transaction history
+    useEffect(() => {
+        if (!user?.customer_id) return;
+
+        fetch(`https://bankuml-backend.onrender.com/transactions/${user.customer_id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("Fetched transactions:", data);
+                setTransactions(data);
+            })
+            .catch((err) => console.error("Failed to fetch transactions:", err));
+    }, [user]);
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -23,27 +34,49 @@ export function TransactionHistory(accountType) {
         setSelectedField(null);
         setOpen(false);
     };
+
     return (
         <>
             <Stack>
-                {fields.map((field) => (
-
-                    <Card sx={{ width: "100%", marginBottom: "2em" }}>
+                {transactions.map((t) => (
+                    <Card key={t.transaction_id} sx={{ width: "100%", mb: 2 }}>
                         <Grid container>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                <h4 style={{ textAlign: "start" }}>{field.labelAmount + field.valueAmount}</h4>
-                                <h5 style={{ textAlign: "start" }}>{field.labelNumber + field.valueNumber}</h5>
+                            <Grid xs={6} sx={{ pl: 2 }}>
+                                <h4 style={{ textAlign: "start" }}>
+                                    Amount: ${t.amount}
+                                </h4>
+                                <h5 style={{ textAlign: "start" }}>
+                                    Card: {t.card_number}
+                                </h5>
                             </Grid>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
-                                <Button endIcon={<ArrowForwardIosIcon />}
-                                    onClick={() => handleOpen(field)}
-                                >View Details
+
+                            <Grid 
+                                xs={6} 
+                                sx={{ 
+                                    display: "flex", 
+                                    justifyContent: "center", 
+                                    alignItems: "center", 
+                                    pr: 2 
+                                }}
+                            >
+                                <Button
+                                    endIcon={<ArrowForwardIosIcon />}
+                                    onClick={() => handleOpen(t)}
+                                >
+                                    View Details
                                 </Button>
                             </Grid>
                         </Grid>
                     </Card>
                 ))}
+
+                {transactions.length === 0 && (
+                    <p style={{ textAlign: "center", opacity: 0.6 }}>
+                        No transactions found.
+                    </p>
+                )}
             </Stack>
+
             <Modal open={open} onClose={handleClose}>
                 <Box
                     sx={{
@@ -61,7 +94,6 @@ export function TransactionHistory(accountType) {
                     {selectedField && (
                         <DetailsOverlay
                             title="Transaction History"
-                            accountType={accountType}
                             field={selectedField}
                             onClose={handleClose}
                         />

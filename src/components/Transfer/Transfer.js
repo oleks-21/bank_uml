@@ -1,73 +1,60 @@
-import React from "react";
 import { useState } from "react";
-import Stack from "@mui/material/Stack";
-import { Grid, Card, Button, Box, Modal } from "@mui/material";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
+import { Stack, TextField, Button, Typography, Card } from "@mui/material";
 
-export function Transfer(accountType) {
-    const [selectedField, setSelectedField] = useState(null);
-    const [open, setOpen] = useState(false);
+export function Transfer({ accountType }) {
+    const [formData, setFormData] = useState({
+        from: "",
+        to: "",
+        amount: ""
+    });
 
-    const fields = [
-        { labelAmount: "Amount Paid: ", valueAmount: "1200$", labelNumber: "Card Number: ", valueNumber: "2496 0968 9621 1134", labelDate: "Date of Payment: ", valueDate: "2014-03-14", labelTime: "Time: ", value: "13:44" },
-        { labelAmount: "Amount Paid: ", valueAmount: "200$", labelNumber: "Card Number: ", valueNumber: "4567 3423 1342 3453", labelDate: "Date of Payment: ", valueDate: "2018-09-11", labelTime: "Time: ", value: "08:32" },
-        { labelAmount: "Amount Paid: ", valueAmount: "12$", labelNumber: "Card Number: ", valueNumber: "4567 3423 1342 3453", labelDate: "Date of Payment: ", valueDate: "2014-12-26", labelTime: "Time: ", value: "19:04" },
-    ]
-    const handleOpen = (field) => {
-        setSelectedField(field);
-        setOpen(true);
+    const handleChange = (field) => (e) => {
+        setFormData({ ...formData, [field]: e.target.value });
     };
 
-    const handleClose = () => {
-        setSelectedField(null);
-        setOpen(false);
+    const handleTransfer = () => {
+        console.log("Transfer request:", formData);
+        alert("Transfer button pressed — backend not yet implemented.");
     };
+
     return (
-        <>
-            <Stack>
-                {fields.map((field) => (
+        <Card sx={{ p: 4, maxWidth: 500, mx: "auto", mt: 4 }}>
+            <Stack spacing={3}>
+                <Typography variant="h5" fontWeight="bold" textAlign="center">
+                    Select Accounts to Transfer Funds
+                </Typography>
 
-                    <Card sx={{ width: "100%", marginBottom: "2em" }}>
-                        <Grid container>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                <h4 style={{ textAlign: "start" }}>{field.labelAmount + field.valueAmount}</h4>
-                                <h5 style={{ textAlign: "start" }}>{field.labelNumber + field.valueNumber}</h5>
-                            </Grid>
-                            <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
-                                <Button endIcon={<ArrowForwardIosIcon />}
-                                    onClick={() => handleOpen(field)}
-                                >View Details
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                ))}
-            </Stack>
-            <Modal open={open} onClose={handleClose}>
-                <Box
-                    sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: 500,
-                        bgcolor: "background.paper",
-                        borderRadius: 2,
-                        boxShadow: 24,
-                        p: 4
-                    }}
+                <TextField
+                    label="From Account"
+                    fullWidth
+                    value={formData.from}
+                    onChange={handleChange("from")}
+                />
+
+                <TextField
+                    label="To Account"
+                    fullWidth
+                    value={formData.to}
+                    onChange={handleChange("to")}
+                />
+
+                <TextField
+                    label="Amount"
+                    fullWidth
+                    type="number"
+                    value={formData.amount}
+                    onChange={handleChange("amount")}
+                />
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={handleTransfer}
                 >
-                    {selectedField && (
-                        <DetailsOverlay
-                            title="Transaction History"
-                            accountType={accountType}
-                            field={selectedField}
-                            onClose={handleClose}
-                        />
-                    )}
-                </Box>
-            </Modal>
-        </>
+                    Transfer
+                </Button>
+            </Stack>
+        </Card>
     );
 }

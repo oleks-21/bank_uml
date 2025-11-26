@@ -33,7 +33,20 @@ export function Profile({ accountType }) {
         } else if (user?.worker_id) {
             fetch(`https://bank-uml.onrender.com/worker/${user.worker_id}`)
                 .then((res) => res.json())
-                .then((data) => setUserData(data))
+                .then((data) => {
+                    setUserData(data);
+                    setEditData({
+                        first_name: data.first_name || "",
+                        last_name: data.last_name || "",
+                        email: data.email || "",
+                        date_of_birth: data.date_of_birth || "",
+                        country: data.country || "",
+                        province: data.province || "",
+                        city: data.city || "",
+                        street: data.street || "",
+                        postal_code: data.postal_code || "",
+                    });
+                })
                 .catch((err) => console.error("Failed to fetch worker profile:", err));
         }
     }, [accountType, user]);
