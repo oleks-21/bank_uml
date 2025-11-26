@@ -304,7 +304,7 @@ app.get('/transfers/:customerId', (req, res) => {
     FROM Transfer t
     JOIN Account a_from ON t.card_number_from = a_from.card_number
     JOIN Account a_to ON t.card_number_to = a_to.card_number
-    WHERE a_from.customer_id = ? OR a_to.customer_id = ?
+    WHERE a_from.user_id = ? OR a_to.user_id = ?
   `;
   db.query(query, [customerId, customerId], (err, results) => {
     if (err) {
