@@ -317,7 +317,7 @@ app.get('/transfers/:customerId', (req, res) => {
 
 // Fetch all pending transfers
 app.get('/pending-transfers', (req, res) => {
-  const query = `SELECT * FROM Transfer WHERE pending_status = 1`;
+  const query = `SELECT * FROM Transfer WHERE pending = 1`;
   db.query(query, (err, results) => {
     if (err) {
       console.error('❌ Fetch pending transfers error:', err);
