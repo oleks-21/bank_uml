@@ -97,6 +97,7 @@ export function StaffAcounts({ accountType }) {
                             accountType={accountType}
                             field={selectedField}
                             onClose={handleClose}
+                            editable={true}
                         />
                     )}
                 </Box>

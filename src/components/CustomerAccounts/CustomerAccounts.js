@@ -95,6 +95,7 @@ export function CustomerAccounts({ accountType }) {
                             accountType={accountType}
                             field={selectedField}
                             onClose={handleClose}
+                            editable={true}
                         />
                     )}
                 </Box>

@@ -88,6 +88,7 @@ export function TransferHistory() {
                             title="Transfer History"
                             field={selectedField}
                             onClose={handleClose}
+                            editable={false}
                         />
                     )}
                 </Box>

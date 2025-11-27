@@ -135,6 +135,7 @@ export function PendingTransactions({ accountType }) {
                                 accountType={accountType}
                                 field={selectedField}
                                 onClose={handleClose}
+                                editable={false}
                             />
 
                             <Stack direction="row" spacing={2} sx={{ mt: 3 }}>

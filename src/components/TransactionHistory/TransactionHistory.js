@@ -91,6 +91,7 @@ export function TransactionHistory() {
                             title="Transaction History"
                             field={selectedField}
                             onClose={handleClose}
+                            editable={false}
                         />
                     )}
                 </Box>

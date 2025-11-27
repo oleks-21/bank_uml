@@ -185,15 +185,10 @@ app.post("/register", (req, res) => {
 });
 
 // Fetch accounts (optionally filtered by customerId)
-app.get('/accounts', (req, res) => {
+app.get('/accounts/:customerId', (req, res) => {
   const { customerId } = req.query;
-  let query = `SELECT * FROM Account`;
+  let query = (`SELECT * FROM Account where user_id = ?`, [customerId]);
   const params = [];
-
-  if (customerId) {
-    query += ` WHERE customer_id = ?`;
-    params.push(customerId);
-  }
 
   db.query(query, params, (err, results) => {
     if (err) {

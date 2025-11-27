@@ -3,20 +3,21 @@ import Stack from "@mui/material/Stack";
 import { Grid, Card, Button, Typography, Modal, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
-
+import { useSelector } from "react-redux";
 export function AccountsList({ accountType }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { user } = useSelector((state) => state.user);  // get logged-in user
 
     useEffect(() => {
         const baseUrl = 'https://bank-uml.onrender.com';
         const fetchAccounts = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`${baseUrl}/accounts`);
+                const res = await fetch(`${baseUrl}/accounts${user.customer_id}`);
                 if (!res.ok) throw new Error(`Failed to fetch accounts: ${res.status}`);
                 const data = await res.json();
                 setAccounts(data);
@@ -101,6 +102,7 @@ export function AccountsList({ accountType }) {
                             field={selectedField}
                             onClose={handleClose}
                             accountType={accountType}
+                            editable={false}
                         />
                     )}
                 </Box>

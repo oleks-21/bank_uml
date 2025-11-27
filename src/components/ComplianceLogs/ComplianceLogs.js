@@ -63,6 +63,7 @@ export function ComplianceLogs(accountType) {
                             field={selectedField}
                             onClose={handleClose}
                             accountType={accountType}
+                            editable={false}
                         />
                     )}
                 </Box>
