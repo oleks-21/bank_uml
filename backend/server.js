@@ -522,7 +522,7 @@ app.patch('/transfer-action/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error("Transfer error:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error: "+tx.amount +" "+ tx.card_number_to+" "+ tx.card_number_from });
   }
 });
 
