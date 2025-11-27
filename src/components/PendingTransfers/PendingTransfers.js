@@ -47,22 +47,22 @@ export function PendingTransfers({ accountType }) {
                 {!loading && !error && transfers.map((field, idx) => {
                     const displayField = {
                         ...field,
-                        labelFrom: "From Account: ",
-                        valueFrom: field.from_account || '',
-                        labelTo: "To Account: ",
-                        valueTo: field.to_account || '',
-                        labelAmount: "Amount: ",
-                        valueAmount: field.amount ? `${field.amount}$` : '',
-                        labelStatus: "Status: ",
-                        valueStatus: field.status || '',
+                        // labelFrom: "From Account: ",
+                        // valueFrom: field.from_account || '',
+                        // labelTo: "To Account: ",
+                        // valueTo: field.to_account || '',
+                        // labelAmount: "Amount: ",
+                        // valueAmount: field.amount ? `${field.amount}$` : '',
+                        // labelStatus: "Status: ",
+                        // valueStatus: field.status || '',
                     };
                     return (
                         <Card key={field.transfer_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                    <h4 style={{ textAlign: "start" }}>{displayField.labelFrom + displayField.valueFrom}</h4>
-                                    <h5 style={{ textAlign: "start" }}>{displayField.labelTo + displayField.valueTo}</h5>
-                                    <h5 style={{ textAlign: "start" }}>{displayField.labelAmount + displayField.valueAmount}</h5>
+                                    <h4 style={{ textAlign: "start" }}>{"From Account: " + (field.card_number_from || '')}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{"To Account: " + (field.card_number_to || '')}</h5>
+                                    <h5 style={{ textAlign: "start" }}>{"Amount: " + (field.amount ? `${field.amount}$` : '')}</h5>
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
                                     <Button endIcon={<ArrowForwardIosIcon />}

@@ -329,8 +329,8 @@ app.get('/pending-transfers', (req, res) => {
 
 // Transfer funds between accounts
 app.post('/transfer', async (req, res) => {
-  const { from, to, amount } = req.body;
-  if (!from || !to || !amount || isNaN(amount)) {
+  const { from, to, amount, customer_id } = req.body;
+  if (!from || !to || !amount || isNaN(amount) || !customer_id) {
     return res.status(400).json({ message: 'Missing or invalid transfer data.' });
   }
 
@@ -343,18 +343,24 @@ app.post('/transfer', async (req, res) => {
   });
 
   try {
+    // 0. Check that 'from' card_number belongs to the customer_id
+    const [accountCheck] = await queryAsync('SELECT * FROM Account WHERE card_number = ? AND customer_id = ?', [from, customer_id]);
+    if (!accountCheck) {
+      return res.status(403).json({ message: 'Sender card does not belong to the current user.' });
+    }
+
     // 1. Get sender and recipient accounts
-    const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', (from));
-    const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', (to));
+    const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [from]);
+    const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [to]);
     if (!sender || !recipient) {
-      return res.status(404).json({ message: 'Sender or recipient account not found. ' });
+      return res.status(404).json({ message: 'Sender or recipient account not found.' });
     }
 
     // 2. Check frozen status for both customers
-    const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.user_id]);
-    const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.user_id]);
+    const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.customer_id]);
+    const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.customer_id]);
     if (!senderCustomer || !recipientCustomer) {
-      return res.status(405).json({ message: 'Sender or recipient customer not found.' });
+      return res.status(404).json({ message: 'Sender or recipient customer not found.' });
     }
     if (senderCustomer.frozen || recipientCustomer.frozen) {
       return res.status(403).json({ message: 'Sender or recipient account is frozen.' });

@@ -48,25 +48,25 @@ export function PendingTransactions({ accountType }) {
                     // Map database row fields to UI-friendly values
                     const displayField = {
                         ...field,
-                        labelName: "Full Name: ",
-                        valueName: field.full_name || field.name || '',
-                        labelCard: "Card Number: ",
-                        valueCard: field.card_number || field.account_number || '',
-                        labelTransaction: "Transaction Amount: ",
-                        valueTransaction: field.amount ? `${field.amount}$` : '',
-                        labelEmail: "Email: ",
-                        valueEmail: field.email || '',
-                        labelDate: "Date of Birth: ",
-                        valueDate: field.date_of_birth || '',
-                        labelAddress: "Address: ",
-                        value: field.address || '',
+                        // labelName: "Full Name: ",
+                        // valueName: field.full_name || field.name || '',
+                        // labelCard: "Card Number: ",
+                        // valueCard: field.card_number || field.account_number || '',
+                        // labelTransaction: "Transaction Amount: ",
+                        // valueTransaction: field.amount ? `${field.amount}$` : '',
+                        // labelEmail: "Email: ",
+                        // valueEmail: field.email || '',
+                        // labelDate: "Date of Birth: ",
+                        // valueDate: field.date_of_birth || '',
+                        // labelAddress: "Address: ",
+                        // value: field.address || '',
                     };
                     return (
                         <Card key={field.transaction_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                    <h4 style={{ textAlign: "start" }}>{displayField.labelCard + displayField.valueCard}</h4>
-                                    <h5 style={{ textAlign: "start" }}>{displayField.labelTransaction + displayField.valueTransaction}</h5>
+                                    <h4 style={{ textAlign: "start" }}>{"Card Number: " + field.card_number || field.account_number || ''}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{"Transaction Amount: " + (field.amount ? `${field.amount}$` : '')}</h5>
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
                                     <Button endIcon={<ArrowForwardIosIcon />}

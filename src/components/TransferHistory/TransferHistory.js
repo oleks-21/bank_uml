@@ -43,10 +43,10 @@ export function TransferHistory() {
                                     Amount: ${t.amount}
                                 </h4>
                                 <h5 style={{ textAlign: "start" }}>
-                                    From: {t.from_account}
+                                    From: {t.card_number_from}
                                 </h5>
                                 <h5 style={{ textAlign: "start" }}>
-                                    To: {t.to_account}
+                                    To: {t.card_number_to}
                                 </h5>
                             </Grid>
                             <Grid 
