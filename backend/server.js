@@ -344,7 +344,7 @@ app.post('/transfer', async (req, res) => {
 
   try {
     // 0. Check that 'from' card_number belongs to the customer_id
-    const [accountCheck] = await queryAsync('SELECT * FROM Account WHERE card_number = ? AND customer_id = ?', [from, customer_id]);
+    const [accountCheck] = await queryAsync('SELECT * FROM Account WHERE card_number = ? AND user_id = ?', [from, customer_id]);
     if (!accountCheck) {
       return res.status(403).json({ message: 'Sender card does not belong to the current user.' });
     }

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Stack, TextField, Button, Typography, Card } from "@mui/material";
+import { useSelector } from "react-redux";
 
 export function Transfer({ accountType }) {
+    const { user } = useSelector((state) => state.user);
+    console.log("Logged-in user in Transfer component:", user.customer_id);
     const [formData, setFormData] = useState({
         from: "",
         to: "",
@@ -29,6 +32,7 @@ export function Transfer({ accountType }) {
                 body: JSON.stringify({
                     from: formData.from,
                     to: formData.to,
+                    customer_id: user?.customer_id,
                     amount: Number(formData.amount)
                 })
             });
