@@ -69,6 +69,7 @@ app.get("/worker/:id", (req, res) => {
   });
 });
 
+//TC-01: Validate Successful Login and TC-02: Reject Invalid Login (Wrong Password)
 app.post("/login", (req, res) => {
   const { cardNumber, password } = req.body;
 
@@ -96,6 +97,7 @@ app.post("/login", (req, res) => {
   });
 });
 
+//TC-04: Reject Login When Email Does Not Exist (worker)
 app.post("/login-worker", (req, res) => {
   const { email, password } = req.body;
 
@@ -123,7 +125,25 @@ app.post("/login-worker", (req, res) => {
   });
 });
 
+
+//function to check the age
+function isAtLeast18(dateOfBirth) {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age >= 18;
+}
+
+//TC-07: Registration Fails When the User is Underage
 app.post("/register", (req, res) => {
+
   const {
     first_name,
     last_name,
@@ -141,8 +161,14 @@ app.post("/register", (req, res) => {
 
   const primary_card_number = Math.floor(1e15 + Math.random() * 9e15);
 
-  if (!first_name || !last_name || !email || !password) {
+  if (!first_name || !last_name || !email || !password || !date_of_birth) {
     return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if(!isAtLeast18(date_of_birth)){
+    return res.status(403).json({
+      message: "You must be at least 18 years old to create an account"
+    });
   }
 
   const query = `
