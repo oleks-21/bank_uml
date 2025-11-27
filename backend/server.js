@@ -187,10 +187,9 @@ app.post("/register", (req, res) => {
 // Fetch accounts (optionally filtered by customerId)
 app.get('/accounts/:customerId', (req, res) => {
   const { customerId } = req.query;
-  let query = (`SELECT * FROM Account where user_id = ?`, [customerId]);
-  const params = [];
+  let query = `SELECT * FROM Account where user_id = ?`;
 
-  db.query(query, params, (err, results) => {
+  db.query(query, [customerId], (err, results) => {
     if (err) {
       console.error('❌ Fetch accounts error:', err);
       return res.status(500).json({ message: 'Internal server error' });

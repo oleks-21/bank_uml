@@ -17,7 +17,7 @@ export function AccountsList({ accountType }) {
         const fetchAccounts = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`${baseUrl}/accounts${user.customer_id}`);
+                const res = await fetch(`${baseUrl}/accounts/${user.customer_id}`);
                 if (!res.ok) throw new Error(`Failed to fetch accounts: ${res.status}`);
                 const data = await res.json();
                 setAccounts(data);
