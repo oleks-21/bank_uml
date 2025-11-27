@@ -276,6 +276,33 @@ app.patch('/user/:id', (req, res) => {
   });
 });
 
+// Update worker profile fields
+app.patch('/worker/:id', (req, res) => {
+  const { id } = req.params;
+  const allowedFields = [
+    'first_name', 'last_name', 'email', 'role', 'date_of_birth',
+    'country', 'province', 'city', 'street', 'postal_code'
+  ];
+  const updates = Object.entries(req.body)
+    .filter(([key]) => allowedFields.includes(key));
+
+  if (updates.length === 0) {
+    return res.status(400).json({ message: 'No valid fields to update.' });
+  }
+
+  const setClause = updates.map(([key]) => `${key} = ?`).join(', ');
+  const values = updates.map(([, value]) => value);
+
+  const query = `UPDATE Worker SET ${setClause} WHERE worker_id = ?`;
+  db.query(query, [...values, id], (err, result) => {
+    if (err) {
+      console.error('❌ Update worker error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json({ success: true, affectedRows: result.affectedRows });
+  });
+});
+
 // Fetch transactions for a given customer
 app.get("/transactions/:customerId", (req, res) => {
   const { customerId } = req.params;

@@ -66,8 +66,15 @@ export function Profile({ accountType }) {
         setSaveError(null);
         setSaveSuccess(false);
         try {
-            const res = await fetch(`https://bank-uml.onrender.com/user/${user.customer_id}`, {
-                method: "PATCH",
+            let url, method = "PATCH";
+            if (accountType === "user" && user?.customer_id) {
+                url = `https://bank-uml.onrender.com/user/${user.customer_id}`;
+            } else if (user?.worker_id) {
+                url = `https://bank-uml.onrender.com/worker/${user.worker_id}`;
+            }
+            if (!url) throw new Error("No valid user or worker id");
+            const res = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(editData),
             });
