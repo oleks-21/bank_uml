@@ -217,6 +217,22 @@ app.post("/register", (req, res) => {
         customer_id: result.insertId,
         card_number: primary_card_number,
       });
+
+      // Create initial account for the user
+      const accountQuery = `
+        INSERT INTO Account (card_number, balance, account_type, user_id, date_created)
+        VALUES (?, ?, ?, ?, NOW())
+      `;
+      db.query(
+        accountQuery,
+        [primary_card_number, 1000, 'chequing', result.insertId],
+        (accErr) => {
+          if (accErr) {
+            console.error("❌ Account creation error:", accErr);
+            // Optionally handle account creation failure
+          }
+        }
+      );
     }
   );
 });
