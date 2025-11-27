@@ -20,6 +20,7 @@ export function TopBar() {
     dispatch(clearUser());
     navigate("/");
 
+    //TC-17: Logout Properly Invalidates the User’s Session
       setTimeout(() => {
         alert("Successfully logged out");
       }, 100);
