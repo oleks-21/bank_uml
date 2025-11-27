@@ -344,17 +344,17 @@ app.post('/transfer', async (req, res) => {
 
   try {
     // 1. Get sender and recipient accounts
-    const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [Number(from)]);
-    const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [Number(to)]);
+    const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', (from));
+    const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', (to));
     if (!sender || !recipient) {
-      return res.status(404).json({ message: 'Sender or recipient account not found. ' + (typeof from) + " " + (typeof to) });
+      return res.status(404).json({ message: 'Sender or recipient account not found. ' });
     }
 
     // 2. Check frozen status for both customers
     const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.customer_id]);
     const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.customer_id]);
     if (!senderCustomer || !recipientCustomer) {
-      return res.status(404).json({ message: 'Sender or recipient customer not found.' });
+      return res.status(405).json({ message: 'Sender or recipient customer not found.' });
     }
     if (senderCustomer.frozen || recipientCustomer.frozen) {
       return res.status(403).json({ message: 'Sender or recipient account is frozen.' });
