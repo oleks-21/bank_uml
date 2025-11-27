@@ -357,8 +357,8 @@ app.post('/transfer', async (req, res) => {
     }
 
     // 2. Check frozen status for both customers
-    const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.customer_id]);
-    const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.customer_id]);
+    const [senderCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [sender.user_id]);
+    const [recipientCustomer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [recipient.user_id]);
     if (!senderCustomer || !recipientCustomer) {
       return res.status(404).json({ message: 'Sender or recipient customer not found.' });
     }

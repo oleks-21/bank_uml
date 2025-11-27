@@ -30,8 +30,8 @@ export function Transfer({ accountType }) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    from: formData.from,
-                    to: formData.to,
+                    from: Number(formData.from),
+                    to: Number(formData.to),
                     customer_id: user?.customer_id,
                     amount: Number(formData.amount)
                 })
