@@ -70,7 +70,7 @@ export function DetailsOverlay({ title, field, onClose, accountType, editable })
                 {Object.entries(editData).map(([key, value]) => (
                     <Grid container alignItems="center" spacing={1} key={key}>
                         <Grid item xs={5}>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography fullWidth variant="body2" sx={{ fontWeight: 600, width: "100px" }}>
                                 {formatLabel(key)}:
                             </Typography>
                         </Grid>
@@ -82,6 +82,7 @@ export function DetailsOverlay({ title, field, onClose, accountType, editable })
                                     size="small"
                                     variant="outlined"
                                     onChange={handleFieldChange(key)}
+                                    sx={{ width: "340px" }}
                                 />
                             ) : (
                                 <Typography variant="body2">{value}</Typography>
@@ -92,30 +93,47 @@ export function DetailsOverlay({ title, field, onClose, accountType, editable })
                 {saveError && <Typography color="error">{saveError}</Typography>}
                 {saveSuccess && <Typography color="success.main">Saved!</Typography>}
                 <Divider sx={{ my: 1 }} />
-                <Grid container>
-                    <Grid item xs={6}>
+                {/* <Grid container>
+                    <Grid item xs={6}> */}
+
+            </Stack>
+            <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+
+                {/* </Grid> */}
+                {/* <Grid item xs={6}> */}
+                {isEditable ? (
+                    <>
                         <Button
                             variant="contained"
                             color="primary"
                             onClick={onClose}
+                            sx={{ width: "50%" }}
                         >
                             Close
                         </Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                        {isEditable && (
-                            <Button
-                                variant="contained"
-                                color="success"
-                                onClick={handleSave}
-                                sx={{ float: "right" }}
-                                disabled={saving}
-                            >
-                                {saving ? "Saving..." : "Save Changes"}
-                            </Button>
-                        )}
-                    </Grid>
-                </Grid>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleSave}
+                            sx={{ float: "right", width: "50%" }}
+                            disabled={saving}
+                        >
+                            {saving ? "Saving..." : "Save Changes"}
+                        </Button>
+                    </>
+                    ) : (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={onClose}
+                        sx={{ width: "100%" }}
+                    >
+                        Close
+                    </Button>
+
+                )}
+                {/* </Grid> */}
+                {/* </Grid> */}
             </Stack>
         </Card>
     );
