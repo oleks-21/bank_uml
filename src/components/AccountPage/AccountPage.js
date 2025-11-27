@@ -14,6 +14,7 @@ import { ComplianceLogs } from "../ComplianceLogs/ComplianceLogs";
 import { Transfer } from "../Transfer/Transfer";
 import { TransferHistory } from "../TransferHistory/TransferHistory";
 import { PendingTransfers } from "../PendingTransfers/PendingTransfers";
+import { Transaction } from "../Transaction/Transaction";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
@@ -26,6 +27,8 @@ export function AccountPage() {
                 return <><SearchModule /><AccountsList accountType={accountType} /></>;
             case "Transaction History":
                 return <><SearchModule /><TransactionHistory accountType={accountType} /></>;
+            case "Make a Transaction":
+                return <><Transaction accountType={accountType} /></>;
             case "Make a Transfer":
                 return <><Transfer accountType={accountType} /></>;
             case "Customer Accounts":

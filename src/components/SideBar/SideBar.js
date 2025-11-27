@@ -30,7 +30,7 @@ export function SideBar({ accountType, onMenuSelect, selectedMenuItem }) {
       break;
     case "user":
     default:
-      menuItems = ["My Profile", "Accounts", "Transaction History", "Transfer History", "Make a Transfer"];
+      menuItems = ["My Profile", "Accounts", "Transaction History", "Make a Transaction", "Transfer History", "Make a Transfer"];
       break;
   }
   return (

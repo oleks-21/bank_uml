@@ -10,22 +10,24 @@ export function PendingTransactions({ accountType }) {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
+    const baseUrl = "https://bank-uml.onrender.com";
+
+    const fetchTransactions = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${baseUrl}/pending-transactions`);
+            if (!res.ok) throw new Error(`Failed to fetch transactions: ${res.status}`);
+            const data = await res.json();
+            setTransactions(data);
+        } catch (err) {
+            setError(err.message || 'Unknown error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const baseUrl = "https://bank-uml.onrender.com";
-        const fetchTransactions = async () => {
-            try {
-                setLoading(true);
-                const res = await fetch(`${baseUrl}/pending-transactions`);
-                if (!res.ok) throw new Error(`Failed to fetch transactions: ${res.status}`);
-                const data = await res.json();
-                setTransactions(data);
-            } catch (err) {
-                setError(err.message || 'Unknown error');
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchTransactions();
     }, []);
 
@@ -39,38 +41,70 @@ export function PendingTransactions({ accountType }) {
         setOpen(false);
     };
 
+    // -------------------------------------------
+    // 🔥 Accept or Reject Transaction
+    // -------------------------------------------
+    const handleAction = async (transactionId, action) => {
+        try {
+            setActionLoading(true);
+
+            const res = await fetch(`${baseUrl}/transaction/${transactionId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action })
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Server error: ${errorText}`);
+            }
+
+            // Refresh list
+            await fetchTransactions();
+            handleClose();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     return (
         <>
             <Stack>
                 {loading && <p>Loading pending transactions...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
+
                 {!loading && !error && transactions.map((field, idx) => {
-                    // Map database row fields to UI-friendly values
-                    const displayField = {
-                        ...field,
-                        // labelName: "Full Name: ",
-                        // valueName: field.full_name || field.name || '',
-                        // labelCard: "Card Number: ",
-                        // valueCard: field.card_number || field.account_number || '',
-                        // labelTransaction: "Transaction Amount: ",
-                        // valueTransaction: field.amount ? `${field.amount}$` : '',
-                        // labelEmail: "Email: ",
-                        // valueEmail: field.email || '',
-                        // labelDate: "Date of Birth: ",
-                        // valueDate: field.date_of_birth || '',
-                        // labelAddress: "Address: ",
-                        // value: field.address || '',
-                    };
+                    const displayField = { ...field };
+
                     return (
                         <Card key={field.transaction_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                    <h4 style={{ textAlign: "start" }}>{"Card Number: " + field.card_number || field.account_number || ''}</h4>
-                                    <h5 style={{ textAlign: "start" }}>{"Transaction Amount: " + (field.amount ? `${field.amount}$` : '')}</h5>
+                                    <h4 style={{ textAlign: "start" }}>
+                                        {"Card Number: " + (field.card_number || "")}
+                                    </h4>
+                                    <h5 style={{ textAlign: "start" }}>
+                                        {"Transaction Amount: " + (field.amount ? `${field.amount}$` : '')}
+                                    </h5>
                                 </Grid>
-                                <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
-                                    <Button endIcon={<ArrowForwardIosIcon />}
-                                        onClick={() => handleOpen(displayField)}>View Details
+
+                                <Grid
+                                    size={{ xs: 6, sm: 6 }}
+                                    sx={{
+                                        justifyContent: "center",
+                                        alignItems: "end",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        paddingRight: "1em"
+                                    }}
+                                >
+                                    <Button
+                                        endIcon={<ArrowForwardIosIcon />}
+                                        onClick={() => handleOpen(displayField)}
+                                    >
+                                        View Details
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -78,6 +112,8 @@ export function PendingTransactions({ accountType }) {
                     );
                 })}
             </Stack>
+
+            {/* ------------- Modal ------------- */}
             <Modal open={open} onClose={handleClose}>
                 <Box
                     sx={{
@@ -93,12 +129,40 @@ export function PendingTransactions({ accountType }) {
                     }}
                 >
                     {selectedField && (
-                        <DetailsOverlay
-                            title="Pending Transaction"
-                            accountType={accountType}
-                            field={selectedField}
-                            onClose={handleClose}
-                        />
+                        <>
+                            <DetailsOverlay
+                                title="Pending Transaction"
+                                accountType={accountType}
+                                field={selectedField}
+                                onClose={handleClose}
+                            />
+
+                            <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    fullWidth
+                                    disabled={actionLoading}
+                                    onClick={() =>
+                                        handleAction(selectedField.transaction_id, "accept")
+                                    }
+                                >
+                                    {actionLoading ? "Processing..." : "Accept"}
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    fullWidth
+                                    disabled={actionLoading}
+                                    onClick={() =>
+                                        handleAction(selectedField.transaction_id, "reject")
+                                    }
+                                >
+                                    {actionLoading ? "Processing..." : "Reject"}
+                                </Button>
+                            </Stack>
+                        </>
                     )}
                 </Box>
             </Modal>

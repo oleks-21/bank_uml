@@ -436,4 +436,48 @@ app.post('/transaction', async (req, res) => {
   }
 });
 
+app.patch('/transaction/:id', async (req, res) => {
+  const { id } = req.params;
+  const { action } = req.body; // 'accept' or 'reject'
+  if (!action || (action !== 'accept' && action !== 'reject')) {
+    return res.status(400).json({ message: 'Invalid action.' });
+  }
+
+  const queryAsync = (query, params) => new Promise((resolve, reject) => {
+    db.query(query, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+
+  try {
+    // Get transaction
+    const [tx] = await queryAsync('SELECT * FROM Transaction WHERE transaction_id = ?', [id]);
+    if (!tx) {
+      return res.status(404).json({ message: 'Transaction not found.' });
+    }
+    // Only process if pending
+    if (tx.pending !== 1) {
+      return res.status(400).json({ message: 'Transaction is not pending.' });
+    }
+
+    // Always set pending=0
+    await queryAsync('UPDATE Transaction SET pending = 0 WHERE transaction_id = ?', [id]);
+
+    if (action === 'accept') {
+      // Update balance
+      if (tx.transaction_type === 'deposit') {
+        await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [tx.amount, tx.card_number]);
+      } else if (tx.transaction_type === 'withdrawal') {
+        await queryAsync('UPDATE Account SET balance = balance - ? WHERE card_number = ?', [tx.amount, tx.card_number]);
+      }
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Transaction accept/reject error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
