@@ -97,6 +97,25 @@ app.post("/login", (req, res) => {
   });
 });
 
+// TC-17: Logout properly invalidates the user's session
+app.post("/logout", (req, res) => {
+  if (!req.session) {
+    return res.json({ success: true, message: "Already logged out" });
+  }
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("❌ Logout error:", err);
+      return res.status(500).json({ message: "Failed to log out" });
+    }
+
+    // Clear session cookie
+    res.clearCookie("connect.sid");
+    return res.json({ success: true, message: "Logged out successfully" });
+  });
+});
+
+
 //TC-04: Reject Login When Email Does Not Exist (worker)
 app.post("/login-worker", (req, res) => {
   const { email, password } = req.body;
