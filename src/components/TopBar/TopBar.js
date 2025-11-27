@@ -9,14 +9,24 @@ import Box from "@mui/material/Box";
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser } from "../../store/userSlice";
 import Button from "@mui/material/Button";
+
+
 export function TopBar() {
   const navigate = useNavigate();
   const { user, accountType } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
   const handleLogout = () => {
     dispatch(clearUser());
     navigate("/");
+
+    //TC-17: Logout Properly Invalidates the User’s Session
+      setTimeout(() => {
+        alert("Successfully logged out");
+      }, 100);
+
   };
+
   return (
     <AppBar
       position="fixed"
@@ -25,6 +35,7 @@ export function TopBar() {
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
       }}
     >
+    
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* LEFT: Home Button */}
         <IconButton
