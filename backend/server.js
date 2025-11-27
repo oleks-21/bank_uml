@@ -479,7 +479,7 @@ app.patch('/transaction/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-app.patch('/transfer/:id', async (req, res) => {
+app.patch('/transfer-action/:id', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
 

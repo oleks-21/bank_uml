@@ -49,7 +49,7 @@ export function PendingTransfers({ accountType }) {
         try {
             setActionLoading(true);
 
-            const res = await fetch(`${baseUrl}/transfer/${transferId}`, {
+            const res = await fetch(`${baseUrl}/transfer-action/${transferId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action })
