@@ -142,6 +142,7 @@ function isAtLeast18(dateOfBirth) {
 }
 
 //TC-07: Registration Fails When the User is Underage
+//TC-08: Registration Fails When Another Account Uses the Same Email
 app.post("/register", (req, res) => {
 
   const {
@@ -165,12 +166,14 @@ app.post("/register", (req, res) => {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
+  //age checking
   if(!isAtLeast18(date_of_birth)){
     return res.status(403).json({
       message: "You must be at least 18 years old to create an account"
     });
   }
 
+  
   const query = `
     INSERT INTO Customer 
     (first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, document_1, document_2, password, primary_card_number)
@@ -197,6 +200,14 @@ app.post("/register", (req, res) => {
     (err, result) => {
       if (err) {
         console.error("❌ Registration error:", err);
+
+        //this is where the duplicate email error comes from now
+        if (err.code === "ER_DUP_ENTRY") {
+          return res
+            .status(409)
+            .json({ message: "An account with this email already exists" });
+        }
+
         return res.status(500).json({ message: "Failed to register user" });
       }
 
