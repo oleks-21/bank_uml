@@ -344,6 +344,7 @@ app.post('/transfer', async (req, res) => {
 
   try {
     // 1. Get sender and recipient accounts
+    console.log("typeof from>>> ", typeof from);
     const [sender] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [from]);
     const [recipient] = await queryAsync('SELECT * FROM Account WHERE card_number = ?', [to]);
     if (!sender || !recipient) {
