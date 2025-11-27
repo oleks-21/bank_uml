@@ -394,4 +394,46 @@ app.post('/transfer', async (req, res) => {
   }
 });
 
+app.post('/transaction', async (req, res) => {
+  const { card_number, amount, transaction_type, customer_id } = req.body;
+  if (!card_number || !amount || isNaN(amount) || !transaction_type || !customer_id) {
+    return res.status(400).json({ message: 'Missing or invalid transaction data.' });
+  }
+
+  const queryAsync = (query, params) => new Promise((resolve, reject) => {
+    db.query(query, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+
+  try {
+    // 1. Check card_number belongs to user
+    const [account] = await queryAsync('SELECT * FROM Account WHERE card_number = ? AND user_id = ?', [card_number, customer_id]);
+    if (!account) {
+      return res.status(403).json({ message: 'Card does not belong to the current user.' });
+    }
+
+    // 2. For withdrawal, check sufficient funds
+    if (transaction_type === 'withdrawal' && account.balance < amount) {
+      return res.status(400).json({ message: 'Insufficient funds.' });
+    }
+
+    // 3. Check for pending status in Transfer or Transaction tables
+    const pendingTransfer = await queryAsync('SELECT * FROM Transfer WHERE (card_number_from = ? OR card_number_to = ?) AND pending = 1', [card_number, card_number]);
+    const pendingTransaction = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [card_number]);
+    if (pendingTransfer.length > 0 || pendingTransaction.length > 0) {
+      return res.status(409).json({ message: 'There is already a pending transfer or transaction for this account.' });
+    }
+
+    // 4. Insert transaction (pending=1)
+    await queryAsync('INSERT INTO Transaction (amount, card_number, transaction_type, transaction_date, pending) VALUES (?, ?, ?, NOW(), 1)', [amount, card_number, transaction_type]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Transaction error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
