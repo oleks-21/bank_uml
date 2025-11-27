@@ -486,6 +486,12 @@ app.patch('/transfer-action/:id', async (req, res) => {
   if (!["accept", "reject"].includes(action)) {
     return res.status(400).json({ message: "Invalid action." });
   }
+  const queryAsync = (query, params) => new Promise((resolve, reject) => {
+    db.query(query, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
 
   try {
     // 1. Fetch transfer
@@ -522,7 +528,7 @@ app.patch('/transfer-action/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error("Transfer error:", err);
-    res.status(500).json({ message: "Internal server error: "+tx.amount +" "+ tx.card_number_to+" "+ tx.card_number_from });
+    res.status(500).json({ message: "Internal server error: " });
   }
 });
 
