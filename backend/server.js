@@ -479,5 +479,51 @@ app.patch('/transaction/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+app.patch('/transfer/:id', async (req, res) => {
+  const { id } = req.params;
+  const { action } = req.body;
+
+  if (!["accept", "reject"].includes(action)) {
+    return res.status(400).json({ message: "Invalid action." });
+  }
+
+  try {
+    // 1. Fetch transfer
+    const [tx] = await queryAsync(
+      "SELECT * FROM Transfer WHERE transfer_id = ?",
+      [id]
+    );
+    if (!tx) return res.status(404).json({ message: "Transfer not found" });
+
+    // 2. Must be pending
+    if (tx.pending !== 1) {
+      return res.status(400).json({ message: "Transfer is not pending." });
+    }
+
+    // 3. Always set pending = 0
+    await queryAsync(
+      "UPDATE Transfer SET pending = 0 WHERE transfer_id = ?",
+      [id]
+    );
+
+    // 4. Accept → adjust balances
+    if (action === "accept") {
+      await queryAsync(
+        "UPDATE Account SET balance = balance - ? WHERE card_number = ?",
+        [tx.amount, tx.card_number_from]
+      );
+
+      await queryAsync(
+        "UPDATE Account SET balance = balance + ? WHERE card_number = ?",
+        [tx.amount, tx.card_number_to]
+      );
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Transfer error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
