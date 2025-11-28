@@ -71,12 +71,19 @@ export function CardList(accountType, searchValue) {
                     return (
                         <Card key={`${cardNumber}-${idx}`} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
-                                <Grid item xs={6} sm={6} sx={{ paddingLeft: "1em" }}>
+                                <Grid item size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
                                     <h4 style={{ textAlign: "start" }}>{'Card Number: ' + cardNumber}</h4>
                                     <h5 style={{ textAlign: "start" }}>{type}</h5>
                                     <p style={{ textAlign: "start" }}>{'Balance: ' + amount}</p>
                                 </Grid>
-                                <Grid item xs={6} sm={6} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
+                                <Grid item size={{ xs: 6, sm: 6 }}
+                                    sx={{
+                                        justifyContent: "center",
+                                        alignItems: "end",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        paddingRight: "1em"
+                                    }}>
                                     <Button onClick={() => handleOpen(account)} endIcon={<ArrowForwardIosIcon />}>View Details</Button>
                                 </Grid>
                             </Grid>
@@ -104,7 +111,7 @@ export function CardList(accountType, searchValue) {
                             field={selectedAccount}
                             accountType={"teller"}
                             onClose={handleClose}
-                            editable={true}
+                            // editable={true}
                             onSave={handleSaveChanges}
                         />
                     )}
