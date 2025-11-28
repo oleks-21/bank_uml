@@ -578,9 +578,8 @@ app.patch('/transaction/:id', async (req, res) => {
     // Always set pending=0
     await queryAsync('UPDATE Transaction SET pending = 0 WHERE transaction_id = ?', [id]);
 
+    // Accept: update balance
     if (action === 'accept') {
-      // Update balance
-      // TC-05: Accept Transaction and Update Balance // TC-18: Multiple Sequential Deposits Update Balance Correctly
       if (tx.transaction_type === 'deposit') {
         await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [tx.amount, tx.card_number]);
       } else if (tx.transaction_type === 'withdrawal') {
@@ -588,12 +587,28 @@ app.patch('/transaction/:id', async (req, res) => {
       }
     }
 
+    // Audit entry
+    const [primaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [tx.card_number]);
+    await queryAsync(
+      `INSERT INTO Audit (transaction_id, primary_card, secondary_card, amount, primary_balance, secondary_balance, type_of_transaction, date_of_transaction, status)
+       VALUES (?, ?, NULL, ?, ?, NULL, ?, NOW(), ?)`,
+      [
+        tx.transaction_id,
+        tx.card_number,
+        tx.amount,
+        primaryAcc ? primaryAcc.balance : null,
+        tx.transaction_type,
+        action
+      ]
+    );
+
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Transaction accept/reject error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 app.patch('/transfer-action/:id', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -633,12 +648,29 @@ app.patch('/transfer-action/:id', async (req, res) => {
         "UPDATE Account SET balance = balance - ? WHERE card_number = ?",
         [tx.amount, tx.card_number_from]
       );
-
       await queryAsync(
         "UPDATE Account SET balance = balance + ? WHERE card_number = ?",
         [tx.amount, tx.card_number_to]
       );
     }
+
+    // Audit entry
+    const [primaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [tx.card_number_from]);
+    const [secondaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [tx.card_number_to]);
+    await queryAsync(
+      `INSERT INTO Audit (transaction_id, primary_card, secondary_card, amount, primary_balance, secondary_balance, type_of_transaction, date_of_transaction, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+      [
+        tx.transfer_id,
+        tx.card_number_from,
+        tx.card_number_to,
+        tx.amount,
+        primaryAcc ? primaryAcc.balance : null,
+        secondaryAcc ? secondaryAcc.balance : null,
+        'transfer',
+        action
+      ]
+    );
 
     res.json({ success: true });
   } catch (err) {
