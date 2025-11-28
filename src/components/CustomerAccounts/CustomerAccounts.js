@@ -86,6 +86,7 @@ export function CustomerAccounts({ accountType }) {
                         labelAddress: "Address: ",
                         valueAddress: address,
                     };
+                    console.log("field>>> ", field);
                     return (
                         <Card key={field.customer_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>

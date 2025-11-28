@@ -273,7 +273,7 @@ app.get('/accounts/:customerId', (req, res) => {
 
 // Fetch all customer profiles
 app.get('/customers', (req, res) => {
-  const query = `SELECT customer_id, first_name, last_name, email, date_of_birth, country, province, city, street, postal_code FROM Customer`;
+  const query = `SELECT customer_id, first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, frozen FROM Customer`;
   db.query(query, (err, results) => {
     if (err) {
       console.error('❌ Fetch customers error:', err);
