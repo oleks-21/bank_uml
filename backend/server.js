@@ -309,7 +309,7 @@ app.get('/customers', (req, res) => {
 
 // Fetch all staff profiles
 app.get('/workers', (req, res) => {
-  const query = `SELECT worker_id, first_name, last_name, email, role, date_of_birth, country, province, city, street, postal_code FROM Worker`;
+  const query = `SELECT worker_id, first_name, last_name, email, role, date_of_birth, country, province, city, street, postal_code FROM Worker WHERE NOT role = manager`;
   db.query(query, (err, results) => {
     if (err) {
       console.error(' Fetch workers error:', err);

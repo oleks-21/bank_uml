@@ -53,16 +53,6 @@ export function StaffAcounts({ accountType, searchValue }) {
                     const address = `${field.country || ''} ${field.province || ''}, ${field.city || ''} ${field.street || ''} ${field.postal_code || ''}`.replace(/ +/g, ' ').trim();
                     const displayField = {
                         ...field,
-                        // labelName: "Full Name: ",
-                        // valueName: fullName,
-                        // labelEmail: "Email: ",
-                        // valueEmail: field.email || '',
-                        // labelDate: "Date of Birth: ",
-                        // valueDate: field.date_of_birth || '',
-                        // labelAddress: "Address: ",
-                        // valueAddress: address,
-                        // labelRole: "Role: ",
-                        // valueRole: field.role || '',
                     };
                     return (
                         <Card key={field.worker_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
