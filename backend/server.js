@@ -678,5 +678,32 @@ app.patch('/transfer-action/:id', async (req, res) => {
     res.status(500).json({ message: "Internal server error: " });
   }
 });
+// Fetch all audit log entries
+app.get('/audits', (req, res) => {
+  const query = `
+    SELECT 
+      audit_id,
+      transaction_id,
+      type_of_transaction,
+      status,
+      amount,
+      primary_card,
+      secondary_card,
+      primary_balance,
+      secondary_balance,
+      date_of_transaction
+    FROM Audit
+    ORDER BY date_of_transaction DESC;
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("❌ Fetch audits error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    res.json(results);
+  });
+});
 
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
