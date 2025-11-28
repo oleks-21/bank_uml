@@ -3,7 +3,7 @@ import { Stack, Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-export function CustomerAccounts({ accountType }) {
+export function CustomerAccounts({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [customers, setCustomers] = useState([]);
@@ -67,12 +67,17 @@ export function CustomerAccounts({ accountType }) {
         setOpen(false);
     };
 
+    const filteredCustomers = customers.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     return (
         <>
             <Stack>
                 {loading && <p>Loading customers...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-                {!loading && !error && customers.map((field, idx) => {
+                {!loading && !error && filteredCustomers.map((field, idx) => {
                     const fullName = `${field.first_name || ''} ${field.last_name || ''}`.trim();
                     const address = `${field.country || ''} ${field.province || ''}, ${field.city || ''} ${field.street || ''} ${field.postal_code || ''}`.replace(/ +/g, ' ').trim();
                     const displayField = {

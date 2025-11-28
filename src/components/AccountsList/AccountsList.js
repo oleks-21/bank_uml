@@ -4,7 +4,7 @@ import { Grid, Card, Button, Typography, Modal, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 import { useSelector } from "react-redux";
-export function AccountsList({ accountType }) {
+export function AccountsList({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [accounts, setAccounts] = useState([]);
@@ -32,6 +32,11 @@ export function AccountsList({ accountType }) {
         fetchAccounts();
     }, []);
 
+    const filteredAccounts = accounts.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -47,7 +52,7 @@ export function AccountsList({ accountType }) {
             <Stack>
                 {loading && <Typography>Loading accounts...</Typography>}
                 {error && <Typography color="error">{error}</Typography>}
-                {!loading && !error && accounts.map((field, idx) => {
+                {!loading && !error && filteredAccounts.map((field, idx) => {
                     const cardNumber = field.primary_card_number || field.card_number || field.account_number || 'N/A';
                     const type = field.account_type || field.type || field.accountType || 'N/A';
                     const amount = (field.balance !== undefined && field.balance !== null) ? `${field.balance}$` : (field.amount ? `${field.amount}$` : '0.00$');

@@ -5,7 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 import { useSelector } from "react-redux";
 
-export function TransactionHistory() {
+export function TransactionHistory({ accountType, searchValue }) {
     const [transactions, setTransactions] = useState([]);
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
@@ -35,10 +35,15 @@ export function TransactionHistory() {
         setOpen(false);
     };
 
+    const filteredTransactions = transactions.filter((t) => {
+        const text = Object.values(t).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     return (
         <>
             <Stack>
-                {transactions.map((t) => (
+                {filteredTransactions.map((t) => (
                     <Card key={t.transaction_id} sx={{ width: "100%", mb: 2 }}>
                         <Grid container>
                             <Grid xs={6} sx={{ pl: 2 }}>
@@ -65,7 +70,7 @@ export function TransactionHistory() {
                     </Card>
                 ))}
 
-                {transactions.length === 0 && (
+                {filteredTransactions.length === 0 && (
                     <p style={{ textAlign: "center", opacity: 0.6 }}>
                         No transactions found.
                     </p>

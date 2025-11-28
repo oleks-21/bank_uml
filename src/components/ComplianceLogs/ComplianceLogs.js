@@ -3,7 +3,8 @@ import Stack from "@mui/material/Stack";
 import { Grid, Card, Button, Typography, Modal, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
-export function ComplianceLogs(accountType) {
+
+export function ComplianceLogs({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
 
@@ -11,7 +12,13 @@ export function ComplianceLogs(accountType) {
         { labelNumber: "Card Number: ", valueNumber: "4053 4556 7771 2345", labelType: "Type: ", valueType: "Chequing", labelAmount: "Amount Paid: ", valueAmount: "500.00$", labelDate: "Date of Payment: ", valueDate: "2020-05-15" },
         { labelNumber: "Card Number: ", valueNumber: "2496 0968 9621 1134", labelType: "Type: ", valueType: "Savings", labelAmount: "Amount Paid: ", valueAmount: "1305.75$", labelDate: "Date of Payment: ", valueDate: "2021-01-25" },
         { labelNumber: "Card Number: ", valueNumber: "4053 4556 7771 2345", labelType: "Type: ", valueType: "Chequing", labelAmount: "Amount Paid: ", valueAmount: "1100.75$", labelDate: "Date of Payment: ", valueDate: "2016-06-15" },
-    ]
+    ];
+
+    const filteredLogs = fields.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -21,11 +28,11 @@ export function ComplianceLogs(accountType) {
         setOpen(false);
         setSelectedField(null);
     };
+
     return (
         <>
             <Stack>
-                {fields.map((field) => (
-
+                {filteredLogs.map((field) => (
                     <Card sx={{ width: "100%", marginBottom: "2em" }}>
                         <Grid container>
                             <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
@@ -41,7 +48,6 @@ export function ComplianceLogs(accountType) {
                         </Grid>
                     </Card>
                 ))}
-
             </Stack>
             <Modal open={open} onClose={handleClose}>
                 <Box

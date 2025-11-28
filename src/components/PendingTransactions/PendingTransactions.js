@@ -4,7 +4,7 @@ import { Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-export function PendingTransactions({ accountType }) {
+export function PendingTransactions({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [transactions, setTransactions] = useState([]);
@@ -69,13 +69,18 @@ export function PendingTransactions({ accountType }) {
         }
     };
 
+    const filteredTransactions = transactions.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     return (
         <>
             <Stack>
                 {loading && <p>Loading pending transactions...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
-                {!loading && !error && transactions.map((field, idx) => {
+                {!loading && !error && filteredTransactions.map((field, idx) => {
                     const displayField = { ...field };
 
                     return (

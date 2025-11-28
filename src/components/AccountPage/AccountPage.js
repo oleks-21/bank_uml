@@ -19,30 +19,57 @@ export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
     const [selectedMenuItem, setSelectedMenuItem] = useState("My Profile");
+    const [searchValue, setSearchValue] = useState("");
+    const handleSearchChange = (e) => setSearchValue(e.target.value);
+
     const renderContent = () => {
         switch (selectedMenuItem) {
             case "My Profile":
                 return <Profile accountType={accountType} />;
             case "Accounts":
-                return <><SearchModule /><AccountsList accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <AccountsList accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Transaction History":
-                return <><SearchModule /><TransactionHistory accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <TransactionHistory accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Make a Transaction":
                 return <><Transaction accountType={accountType} /></>;
             case "Make a Transfer":
                 return <><Transfer accountType={accountType} /></>;
             case "Customer Accounts":
-                return <><SearchModule /><CustomerAccounts accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <CustomerAccounts accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Pending Transactions":
-                return <><SearchModule /><PendingTransactions accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <PendingTransactions accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Pending Transfers":
-                return <><SearchModule /><PendingTransfers accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <PendingTransfers accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Transfer History":
-                return <><SearchModule /><TransferHistory accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <TransferHistory accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Manage Staff":
-                return <><SearchModule /><StaffAcounts accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <StaffAcounts accountType={accountType} searchValue={searchValue} />
+                </>;
             case "Compliance Logs":
-                return <><SearchModule /><ComplianceLogs accountType={accountType} /></>;
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <ComplianceLogs accountType={accountType} searchValue={searchValue} />
+                </>;
             default:
                 return <p>Select an option from the sidebar.</p>;
         }

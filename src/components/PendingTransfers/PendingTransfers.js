@@ -4,11 +4,11 @@ import { Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-export function PendingTransfers({ accountType }) {
+export function PendingTransfers({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [transfers, setTransfers] = useState([]);
-       const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -70,13 +70,18 @@ export function PendingTransfers({ accountType }) {
         }
     };
 
+    const filteredTransfers = transfers.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     return (
         <>
             <Stack>
                 {loading && <p>Loading pending transfers...</p>}
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
-                {!loading && !error && transfers.map((field, idx) => {
+                {!loading && !error && filteredTransfers.map((field, idx) => {
                     const displayField = { ...field };
 
                     return (

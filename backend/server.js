@@ -159,9 +159,15 @@ function isAtLeast18(dateOfBirth) {
 
   return age >= 18;
 }
-
+function passwordStrength(password) {
+  if((password.length >= 12)&&(/[A-Z]/.test(password))&&(/[a-z]/.test(password))&&(/[0-9]/.test(password))&&(/[\W_]/.test(password))){
+    return true;
+  }
+  return false;
+}
 //TC-07: Registration Fails When the User is Underage
 //TC-08: Registration Fails When Another Account Uses the Same Email
+//TC-16: Registration Fails When the Password is Not Strong Enough
 app.post("/register", (req, res) => {
 
   const {
@@ -189,6 +195,12 @@ app.post("/register", (req, res) => {
   if(!isAtLeast18(date_of_birth)){
     return res.status(403).json({
       message: "You must be at least 18 years old to create an account"
+    });
+  }
+  //password strength checking
+  if(!passwordStrength(password)){
+    return res.status(403).json({
+      message: "Your password must be at least 12 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
     });
   }
 
@@ -332,6 +344,10 @@ app.patch('/worker/:id', (req, res) => {
   const updates = Object.entries(req.body)
     .filter(([key]) => allowedFields.includes(key));
 
+  //TC-13: Reject Invalid Role Update for Staff Accounts
+  if (req.body.role && !['auditor', 'teller'].includes(req.body.role)) {
+    return res.status(400).json({ error: 'Invalid role selected' });
+  }
   if (updates.length === 0) {
     return res.status(400).json({ message: 'No valid fields to update.' });
   }

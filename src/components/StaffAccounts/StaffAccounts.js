@@ -4,7 +4,7 @@ import { Grid, Card, Button, Box, Modal } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-export function StaffAcounts({ accountType }) {
+export function StaffAcounts({ accountType, searchValue }) {
     const [selectedField, setSelectedField] = useState(null);
     const [open, setOpen] = useState(false);
     const [workers, setWorkers] = useState([]);
@@ -29,6 +29,11 @@ export function StaffAcounts({ accountType }) {
         fetchWorkers();
     }, []);
 
+    const filteredWorkers = workers.filter((field) => {
+        const text = Object.values(field).join(" ").toLowerCase();
+        return text.includes(searchValue.toLowerCase());
+    });
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -43,7 +48,7 @@ export function StaffAcounts({ accountType }) {
             <Stack>
                 {loading && <p>Loading staff...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-                {!loading && !error && workers.map((field, idx) => {
+                {!loading && !error && filteredWorkers.map((field, idx) => {
                     const fullName = `${field.first_name || ''} ${field.last_name || ''}`.trim();
                     const address = `${field.country || ''} ${field.province || ''}, ${field.city || ''} ${field.street || ''} ${field.postal_code || ''}`.replace(/ +/g, ' ').trim();
                     const displayField = {
