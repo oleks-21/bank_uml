@@ -42,9 +42,7 @@ export function PendingTransfers({ accountType, searchValue }) {
         setOpen(false);
     };
 
-    // ---------------------------------------------------
-    // 🔥 Accept or Reject Transfer
-    // ---------------------------------------------------
+    //  Accept or Reject Transfer
     const handleAction = async (transferId, action) => {
         try {
             setActionLoading(true);

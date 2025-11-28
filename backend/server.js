@@ -443,7 +443,6 @@ app.post('/transfer', async (req, res) => {
     return res.status(400).json({ message: 'Missing or invalid transfer data.' });
   }
 
-  // Helper to run queries as promises
   const queryAsync = (query, params) => new Promise((resolve, reject) => {
     db.query(query, params, (err, results) => {
       if (err) reject(err);
@@ -475,14 +474,7 @@ app.post('/transfer', async (req, res) => {
       return res.status(403).json({ message: 'Sender or recipient account is frozen.' });
     }
 
-    // 3. Check for pending transfer for either card
-    const pendingTransfers = await queryAsync('SELECT * FROM Transfer WHERE (card_number_from = ? OR card_number_to = ?) AND pending = 1', [from, to]);
-    const pendingTransactionFrom = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [from]);
-    const pendingTransactionTo = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [to]);
-    if (pendingTransfers.length > 0|| pendingTransactionFrom.length > 0 || pendingTransactionTo.length > 0) {
-      return res.status(409).json({ message: 'There is already a pending transfer or transaction for one or both of the accounts.' });
-    }
-
+    // 3. Remove pending checks for transfer/transaction
     // 4. Check sufficient funds
     if (sender.balance < amount) {
       return res.status(400).json({ message: 'Insufficient funds.' });
@@ -497,10 +489,8 @@ app.post('/transfer', async (req, res) => {
       await queryAsync('UPDATE Account SET balance = balance - ? WHERE card_number = ?', [amount, from]);
       await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [amount, to]);
       // Insert audit log for completed transfer
-      // Get balances after update
       const [primaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [from]);
       const [secondaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [to]);
-      // Get transfer_id of the just-inserted transfer
       const [lastTransfer] = await queryAsync('SELECT transfer_id FROM Transfer WHERE card_number_from = ? AND card_number_to = ? ORDER BY transfer_id DESC LIMIT 1', [from, to]);
       await queryAsync(
         `INSERT INTO Audit (transaction_id, primary_card, secondary_card, amount, primary_balance, secondary_balance, type_of_transaction, date_of_transaction, status)
@@ -549,20 +539,12 @@ app.post('/transaction', async (req, res) => {
       return res.status(401).json({ message: 'This account is frozen.' });
     }
     // 2. For withdrawal, check sufficient funds
-    // TC-03: Reject Withdrawal When Insufficient Funds // TC-06: Reject Withdrawal When Insufficient Funds // TC-20: Reject Withdrawal When Insufficient Funds with Pending Transactions
     if (transaction_type === 'withdrawal' && account.balance < amount) {
       return res.status(400).json({ message: 'Insufficient funds.' });
     }
 
-    // 3. Check for pending status in Transfer or Transaction tables
-    const pendingTransfer = await queryAsync('SELECT * FROM Transfer WHERE (card_number_from = ? OR card_number_to = ?) AND pending = 1', [card_number, card_number]);
-    const pendingTransaction = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [card_number]);
-    if (pendingTransfer.length > 0 || pendingTransaction.length > 0) {
-      return res.status(409).json({ message: 'There is already a pending transfer or transaction for this account.' });
-    }
-
+    // 3. Remove pending checks for transfer/transaction
     // 4. Insert transaction (pending=1)
-    // TC-19: Withdrawal and Deposit Transactions are Marked as Pending
     await queryAsync('INSERT INTO Transaction (amount, card_number, transaction_type, transaction_date, pending) VALUES (?, ?, ?, NOW(), 1)', [amount, card_number, transaction_type]);
 
     res.json({ success: true });
@@ -595,6 +577,14 @@ app.patch('/transaction/:id', async (req, res) => {
     // Only process if pending
     if (tx.pending !== 1) {
       return res.status(400).json({ message: 'Transaction is not pending.' });
+    }
+
+    // Sufficient funds check for withdrawal
+    if (action === 'accept' && tx.transaction_type === 'withdrawal') {
+      const [account] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [tx.card_number]);
+      if (!account || account.balance < tx.amount) {
+        return res.status(400).json({ message: 'Insufficient funds for withdrawal.' });
+      }
     }
 
     // Always set pending=0
@@ -656,6 +646,14 @@ app.patch('/transfer-action/:id', async (req, res) => {
     // 2. Must be pending
     if (tx.pending !== 1) {
       return res.status(400).json({ message: "Transfer is not pending." });
+    }
+
+    // Sufficient funds check for transfer accept
+    if (action === "accept") {
+      const [account] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [tx.card_number_from]);
+      if (!account || account.balance < tx.amount) {
+        return res.status(400).json({ message: "Insufficient funds for transfer." });
+      }
     }
 
     // 3. Always set pending = 0

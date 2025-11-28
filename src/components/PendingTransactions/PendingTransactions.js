@@ -41,9 +41,7 @@ export function PendingTransactions({ accountType, searchValue }) {
         setOpen(false);
     };
 
-    // -------------------------------------------
-    // 🔥 Accept or Reject Transaction
-    // -------------------------------------------
+    // Accept or Reject Transaction
     const handleAction = async (transactionId, action) => {
         try {
             setActionLoading(true);
