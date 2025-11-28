@@ -1,69 +1,113 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from "react";
+import Stack from "@mui/material/Stack";
+import { Grid, Card, Button, Typography, Modal, Box } from "@mui/material";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-const CardList = () => {
-  const [accounts, setAccounts] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [showOverlay, setShowOverlay] = useState(false);
+export function CardList(accountType, search) {
+    const [selectedAccount, setSelectedAccount] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [accounts, setAccounts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch('https://bank-uml.onrender.com/accounts')
-      .then(res => res.json())
-      .then(data => setAccounts(data))
-      .catch(err => console.error('Fetch accounts error:', err));
-  }, []);
+    useEffect(() => {
+        const baseUrl = 'https://bank-uml.onrender.com';
+        const fetchAccounts = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${baseUrl}/accounts`);
+                if (!res.ok) throw new Error(`Failed to fetch accounts: ${res.status}`);
+                const data = await res.json();
+                setAccounts(data);
+            } catch (err) {
+                console.error(err);
+                setError(err.message || 'Unknown error');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAccounts();
+    }, []);
 
-  const handleViewDetails = (account) => {
-    setSelectedAccount(account);
-    setShowOverlay(true);
-  };
+    const handleOpen = (account) => {
+        setSelectedAccount(account);
+        setOpen(true);
+    };
 
-  const handleCloseOverlay = () => {
-    setShowOverlay(false);
-    setSelectedAccount(null);
-  };
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedAccount(null);
+    };
 
-  const handleSaveChanges = (updatedFields) => {
-    // PATCH request to update account fields
-    fetch(`https://bank-uml.onrender.com/account/${selectedAccount.card_number}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedFields)
-    })
-      .then(res => res.json())
-      .then(() => {
-        // Refresh accounts list
-        fetch('https://bank-uml.onrender.com/accounts')
-          .then(res => res.json())
-          .then(data => setAccounts(data));
-        handleCloseOverlay();
-      })
-      .catch(err => console.error('Patch account error:', err));
-  };
+    const handleSaveChanges = async (updatedFields) => {
+        // PATCH request to update account fields
+        try {
+            const res = await fetch(`https://bank-uml.onrender.com/account/${selectedAccount.card_number}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedFields)
+            });
+            if (!res.ok) throw new Error('Failed to update account');
+            // Refresh accounts list
+            const refreshed = await fetch('https://bank-uml.onrender.com/accounts');
+            setAccounts(await refreshed.json());
+            handleClose();
+        } catch (err) {
+            console.error('Patch account error:', err);
+        }
+    };
 
-  return (
-    <div>
-      <h2>All Accounts</h2>
-      <div className="card-list">
-        {accounts.map(account => (
-          <div key={account.card_number} className="account-card">
-            <div>Card Number: {account.card_number}</div>
-            <div>Balance: {account.balance}</div>
-            <div>Type: {account.account_type}</div>
-            <button onClick={() => handleViewDetails(account)}>View Details &gt;</button>
-          </div>
-        ))}
-      </div>
-      {showOverlay && (
-        <DetailsOverlay
-          data={selectedAccount}
-          editable={true}
-          onClose={handleCloseOverlay}
-          onSave={handleSaveChanges}
-        />
-      )}
-    </div>
-  );
-};
-
-export default CardList;
+    return (
+        <>
+            <Stack>
+                {loading && <Typography>Loading accounts...</Typography>}
+                {error && <Typography color="error">{error}</Typography>}
+                {!loading && !error && accounts.map((account, idx) => {
+                    const cardNumber = account.card_number || account.primary_card_number || account.account_number || 'N/A';
+                    const type = account.account_type || account.type || account.accountType || 'N/A';
+                    const amount = (account.balance !== undefined && account.balance !== null) ? `${account.balance}$` : (account.amount ? `${account.amount}$` : '0.00$');
+                    return (
+                        <Card key={`${cardNumber}-${idx}`} sx={{ width: "100%", marginBottom: "2em" }}>
+                            <Grid container>
+                                <Grid item xs={6} sm={6} sx={{ paddingLeft: "1em" }}>
+                                    <h4 style={{ textAlign: "start" }}>{'Card Number: ' + cardNumber}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{type}</h5>
+                                    <p style={{ textAlign: "start" }}>{'Balance: ' + amount}</p>
+                                </Grid>
+                                <Grid item xs={6} sm={6} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
+                                    <Button onClick={() => handleOpen(account)} endIcon={<ArrowForwardIosIcon />}>View Details</Button>
+                                </Grid>
+                            </Grid>
+                        </Card>
+                    );
+                })}
+            </Stack>
+            <Modal open={open} onClose={handleClose}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 500,
+                        bgcolor: "background.paper",
+                        borderRadius: 2,
+                        boxShadow: 24,
+                        p: 4
+                    }}
+                >
+                    {selectedAccount && (
+                        <DetailsOverlay
+                            title="Account Details"
+                            field={selectedAccount}
+                            accountType={accountType}
+                            onClose={handleClose}
+                            editable={true}
+                        />
+                    )}
+                </Box>
+            </Modal>
+        </>
+    );
+}

@@ -11,6 +11,7 @@ function formatLabel(label) {
 
 export function DetailsOverlay({ title, field, onClose, accountType, editable }) {
     // Move hooks before any return
+    console.log("editable:", editable, "accountType:", accountType);
     const isEditable = (accountType === "teller" || accountType === "manager") && editable;
     const [editData, setEditData] = useState(field || {});
     const [saving, setSaving] = useState(false);

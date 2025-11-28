@@ -15,7 +15,7 @@ import { Transfer } from "../Transfer/Transfer";
 import { TransferHistory } from "../TransferHistory/TransferHistory";
 import { PendingTransfers } from "../PendingTransfers/PendingTransfers";
 import { Transaction } from "../Transaction/Transaction";
-import CardList from "../CardList/CardList";
+import {CardList} from "../CardList/CardList";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";

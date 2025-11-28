@@ -738,4 +738,28 @@ app.get('/audits', (req, res) => {
   });
 });
 
+app.patch('/accounts/:id', (req, res) => {
+  const { id } = req.params;
+  // Only allow updating certain fields
+  const allowedFields = ['balance', 'account_type', 'user_id'];
+  const updates = Object.entries(req.body)
+    .filter(([key]) => allowedFields.includes(key));
+
+  if (updates.length === 0) {
+    return res.status(400).json({ message: 'No valid fields to update.' });
+  }
+
+  const setClause = updates.map(([key]) => `${key} = ?`).join(', ');
+  const values = updates.map(([, value]) => value);
+
+  const query = `UPDATE Account SET ${setClause} WHERE card_number = ?`;
+  db.query(query, [...values, id], (err, result) => {
+    if (err) {
+      console.error('Update account error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json({ success: true, affectedRows: result.affectedRows });
+  });
+});
+
 app.listen(PORT, "0.0.0.0", () => console.log(` Server running on port ${PORT}`));
