@@ -477,8 +477,10 @@ app.post('/transfer', async (req, res) => {
 
     // 3. Check for pending transfer for either card
     const pendingTransfers = await queryAsync('SELECT * FROM Transfer WHERE (card_number_from = ? OR card_number_to = ?) AND pending = 1', [from, to]);
-    if (pendingTransfers.length > 0) {
-      return res.status(409).json({ message: 'There is already a pending transfer for one of the accounts.' });
+    const pendingTransactionFrom = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [from]);
+    const pendingTransactionTo = await queryAsync('SELECT * FROM Transaction WHERE card_number = ? AND pending = 1', [to]);
+    if (pendingTransfers.length > 0|| pendingTransactionFrom.length > 0 || pendingTransactionTo.length > 0) {
+      return res.status(409).json({ message: 'There is already a pending transfer or transaction for one or both of the accounts.' });
     }
 
     // 4. Check sufficient funds
