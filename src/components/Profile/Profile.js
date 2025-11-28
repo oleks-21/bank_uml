@@ -106,12 +106,12 @@ export function Profile({ accountType }) {
             <Stack spacing={2}>
                 {fields.map((field) => (
                     <Grid key={field.label} container alignItems="center" spacing={2}>
-                        <Grid item xs={4} width="100px">
+                        <Grid item size={{ xs: 3, sm: 3 }} sx={{ paddingLeft: "1em" }}>
                             <Typography variant="body1" sx={{ float: "left" }}>
                                 {field.label}:
                             </Typography>
                         </Grid>
-                        <Grid item xs={8}>
+                        <Grid item xs={6} size={{ xs: 9, sm: 9 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
                             <TextField
                                 fullWidth
                                 value={field.value}
@@ -126,7 +126,7 @@ export function Profile({ accountType }) {
                 {saveError && <Typography color="error">{saveError}</Typography>}
                 {saveSuccess && <Typography color="success.main">Saved!</Typography>}
                 <Grid container justifyContent="flex-start">
-                    <Button variant="contained" color="success" onClick={handleSave} disabled={saving}>
+                    <Button variant="contained" color="success" onClick={handleSave} disabled={saving} fullWidth>
                         {saving ? "Saving..." : "Save Changes"}
                     </Button>
                 </Grid>

@@ -50,7 +50,7 @@ export function ComplianceLogs({ accountType, searchValue }) {
                 {!loading && !error && filteredLogs.map((field, idx) => (
                     <Card key={field.audit_id || idx} sx={{ width: "100%", mb: 2 }}>
                         <Grid container>
-                            <Grid xs={6} sx={{ pl: 2 }}>
+                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
                                 <h4 style={{ textAlign: "start" }}>
                                     {field.type_of_transaction?.toUpperCase()} | {field.status?.toUpperCase()} | {new Date(field.date_of_transaction).toLocaleString()}
                                 </h4>
@@ -66,7 +66,8 @@ export function ComplianceLogs({ accountType, searchValue }) {
                                     </h5>
                                 )}
                             </Grid>
-                            <Grid xs={6} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
+                            <Grid xs={6} size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}
+                            >
                                 <Button
                                     endIcon={<ArrowForwardIosIcon />}
                                     onClick={() => handleOpen(field)}

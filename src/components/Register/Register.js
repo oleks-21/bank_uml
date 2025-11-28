@@ -61,7 +61,7 @@ export function Register() {
   const handleNext = () => setStep((prev) => Math.min(prev + 1, 3));
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  // ✅ Registration handler
+  //  Registration handler
   const handleRegister = async () => {
     if (formData.password !== formData.confirm_password) {
       alert("Passwords do not match!");
@@ -83,15 +83,15 @@ export function Register() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert(`✅ Registration successful! Your card number: ${data.card_number}`);
+        alert(` Registration successful! Your card number: ${data.card_number}`);
         navigate("/account", {
           state: { accountType: "user", user: { customer_id: data.customer_id } },
         });
       } else {
-        alert("❌ Registration failed: " + (data.message || "Unknown error"));
+        alert(" Registration failed: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      console.error("❌ Registration error:", err);
+      console.error(" Registration error:", err);
       alert("Server error. Please try again later.");
     }
   };

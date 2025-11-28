@@ -72,6 +72,7 @@ export function Transaction({ accountType }) {
                         size="large"
                         onClick={() => handleTransaction("withdrawal")}
                         disabled={loading}
+                        fullWidth
                     >
                         Withdraw
                     </Button>
@@ -81,6 +82,7 @@ export function Transaction({ accountType }) {
                         size="large"
                         onClick={() => handleTransaction("deposit")}
                         disabled={loading}
+                        fullWidth
                     >
                         Deposit
                     </Button>

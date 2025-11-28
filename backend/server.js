@@ -25,15 +25,15 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.error("❌ Database connection failed:", err.stack);
+    console.error(" Database connection failed:", err.stack);
     return;
   }
-  console.log("✅ Connected to AWS RDS MySQL");
+  console.log(" Connected to AWS RDS MySQL");
 });
 
 // Root endpoint
 app.get("/", (req, res) => {
-  res.send("✅ Backend is running!");
+  res.send(" Backend is running!");
 });
 
 // Fetch customer by ID
@@ -46,7 +46,7 @@ app.get("/user/:id", (req, res) => {
   `;
   db.query(query, [id], (err, results) => {
     if (err) {
-      console.error("❌ Fetch user error:", err);
+      console.error(" Fetch user error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
     results.length > 0 ? res.json(results[0]) : res.status(404).json({ message: "User not found" });
@@ -62,7 +62,7 @@ app.get("/worker/:id", (req, res) => {
   `;
   db.query(query, [id], (err, results) => {
     if (err) {
-      console.error("❌ Fetch worker error:", err);
+      console.error(" Fetch worker error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
     results.length > 0 ? res.json(results[0]) : res.status(404).json({ message: "Worker not found" });
@@ -85,7 +85,7 @@ app.post("/login", (req, res) => {
 
   db.query(query, [cardNumber, password], (err, results) => {
     if (err) {
-      console.error("❌ Login query error:", err);
+      console.error(" Login query error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
 
@@ -105,7 +105,7 @@ app.post("/logout", (req, res) => {
 
   req.session.destroy((err) => {
     if (err) {
-      console.error("❌ Logout error:", err);
+      console.error(" Logout error:", err);
       return res.status(500).json({ message: "Failed to log out" });
     }
 
@@ -132,7 +132,7 @@ app.post("/login-worker", (req, res) => {
 
   db.query(query, [email, password], (err, results) => {
     if (err) {
-      console.error("❌ Worker login error:", err);
+      console.error(" Worker login error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
 
@@ -230,7 +230,7 @@ app.post("/register", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("❌ Registration error:", err);
+        console.error(" Registration error:", err);
 
         //this is where the duplicate email error comes from now
         if (err.code === "ER_DUP_ENTRY") {
@@ -259,7 +259,7 @@ app.post("/register", (req, res) => {
         [primary_card_number, 1000, 'chequing', result.insertId],
         (accErr) => {
           if (accErr) {
-            console.error("❌ Account creation error:", accErr);
+            console.error(" Account creation error:", accErr);
             // Optionally handle account creation failure
           }
         }
@@ -275,7 +275,7 @@ app.get('/accounts/:customerId', (req, res) => {
 
   db.query(query, [customerId], (err, results) => {
     if (err) {
-      console.error('❌ Fetch accounts error:', err);
+      console.error(' Fetch accounts error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
 
@@ -288,7 +288,7 @@ app.get('/customers', (req, res) => {
   const query = `SELECT customer_id, first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, frozen FROM Customer`;
   db.query(query, (err, results) => {
     if (err) {
-      console.error('❌ Fetch customers error:', err);
+      console.error(' Fetch customers error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
@@ -300,7 +300,7 @@ app.get('/workers', (req, res) => {
   const query = `SELECT worker_id, first_name, last_name, email, role, date_of_birth, country, province, city, street, postal_code FROM Worker`;
   db.query(query, (err, results) => {
     if (err) {
-      console.error('❌ Fetch workers error:', err);
+      console.error(' Fetch workers error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
@@ -327,7 +327,7 @@ app.patch('/user/:id', (req, res) => {
   const query = `UPDATE Customer SET ${setClause} WHERE customer_id = ?`;
   db.query(query, [...values, id], (err, result) => {
     if (err) {
-      console.error('❌ Update customer error:', err);
+      console.error(' Update customer error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json({ success: true, affectedRows: result.affectedRows });
@@ -358,7 +358,7 @@ app.patch('/worker/:id', (req, res) => {
   const query = `UPDATE Worker SET ${setClause} WHERE worker_id = ?`;
   db.query(query, [...values, id], (err, result) => {
     if (err) {
-      console.error('❌ Update worker error:', err);
+      console.error(' Update worker error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json({ success: true, affectedRows: result.affectedRows });
@@ -385,7 +385,7 @@ app.get("/transactions/:customerId", (req, res) => {
 
   db.query(query, [customerId], (err, results) => {
     if (err) {
-      console.error("❌ Fetch transactions error:", err);
+      console.error(" Fetch transactions error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
 
@@ -398,7 +398,7 @@ app.get('/pending-transactions', (req, res) => {
   const query = `SELECT * FROM Transaction WHERE pending = 1`;
   db.query(query, (err, results) => {
     if (err) {
-      console.error('❌ Fetch pending transactions error:', err);
+      console.error(' Fetch pending transactions error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
@@ -417,7 +417,7 @@ app.get('/transfers/:customerId', (req, res) => {
   `;
   db.query(query, [customerId, customerId], (err, results) => {
     if (err) {
-      console.error('❌ Fetch transfers error:', err);
+      console.error(' Fetch transfers error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
@@ -429,7 +429,7 @@ app.get('/pending-transfers', (req, res) => {
   const query = `SELECT * FROM Transfer WHERE pending = 1`;
   db.query(query, (err, results) => {
     if (err) {
-      console.error('❌ Fetch pending transfers error:', err);
+      console.error(' Fetch pending transfers error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
@@ -500,7 +500,7 @@ app.post('/transfer', async (req, res) => {
 
     res.json({ success: true, pending: !!pending });
   } catch (err) {
-    console.error('❌ Transfer error:', err);
+    console.error(' Transfer error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -547,7 +547,7 @@ app.post('/transaction', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error('❌ Transaction error:', err);
+    console.error(' Transaction error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -606,7 +606,7 @@ app.patch('/transaction/:id', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error('❌ Transaction accept/reject error:', err);
+    console.error(' Transaction accept/reject error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -700,7 +700,7 @@ app.get('/audits', (req, res) => {
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error("❌ Fetch audits error:", err);
+      console.error(" Fetch audits error:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
 
@@ -708,4 +708,4 @@ app.get('/audits', (req, res) => {
   });
 });
 
-app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(` Server running on port ${PORT}`));
