@@ -496,6 +496,26 @@ app.post('/transfer', async (req, res) => {
     if (pending === 0) {
       await queryAsync('UPDATE Account SET balance = balance - ? WHERE card_number = ?', [amount, from]);
       await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [amount, to]);
+      // Insert audit log for completed transfer
+      // Get balances after update
+      const [primaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [from]);
+      const [secondaryAcc] = await queryAsync('SELECT balance FROM Account WHERE card_number = ?', [to]);
+      // Get transfer_id of the just-inserted transfer
+      const [lastTransfer] = await queryAsync('SELECT transfer_id FROM Transfer WHERE card_number_from = ? AND card_number_to = ? ORDER BY transfer_id DESC LIMIT 1', [from, to]);
+      await queryAsync(
+        `INSERT INTO Audit (transaction_id, primary_card, secondary_card, amount, primary_balance, secondary_balance, type_of_transaction, date_of_transaction, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+        [
+          lastTransfer ? lastTransfer.transfer_id : null,
+          from,
+          to,
+          amount,
+          primaryAcc ? primaryAcc.balance : null,
+          secondaryAcc ? secondaryAcc.balance : null,
+          'transfer',
+          'accept'
+        ]
+      );
     }
 
     res.json({ success: true, pending: !!pending });
