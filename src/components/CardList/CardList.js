@@ -4,7 +4,7 @@ import { Grid, Card, Button, Typography, Modal, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DetailsOverlay } from "../DetailsOverlay/DetailsOverlay";
 
-export function CardList(accountType, search) {
+export function CardList(accountType, searchValue) {
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [open, setOpen] = useState(false);
     const [accounts, setAccounts] = useState([]);
@@ -42,6 +42,7 @@ export function CardList(accountType, search) {
 
     const handleSaveChanges = async (updatedFields) => {
         // PATCH request to update account fields
+        console.log("Updating account with fields:", updatedFields);
         try {
             const res = await fetch(`https://bank-uml.onrender.com/account/${selectedAccount.card_number}`, {
                 method: 'PATCH',
@@ -101,9 +102,10 @@ export function CardList(accountType, search) {
                         <DetailsOverlay
                             title="Account Details"
                             field={selectedAccount}
-                            accountType={accountType}
+                            accountType={"teller"}
                             onClose={handleClose}
                             editable={true}
+                            onSave={handleSaveChanges}
                         />
                     )}
                 </Box>
