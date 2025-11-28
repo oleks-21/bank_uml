@@ -506,7 +506,10 @@ app.post('/transaction', async (req, res) => {
     if (!account) {
       return res.status(403).json({ message: 'Card does not belong to the current user.' });
     }
-
+    const [customer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [customer_id]);
+    if (customer.frozen = 1) {
+      return res.status(401).json({ message: 'This account is frozen.' });
+    }
     // 2. For withdrawal, check sufficient funds
     // TC-03: Reject Withdrawal When Insufficient Funds // TC-06: Reject Withdrawal When Insufficient Funds // TC-20: Reject Withdrawal When Insufficient Funds with Pending Transactions
     if (transaction_type === 'withdrawal' && account.balance < amount) {
