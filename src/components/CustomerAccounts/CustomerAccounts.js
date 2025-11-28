@@ -28,6 +28,35 @@ export function CustomerAccounts({ accountType }) {
         fetchCustomers();
     }, []);
 
+    const handleFreezeToggle = async (customerId, freezeStatus) => {
+        try {
+            const baseUrl = 'https://bank-uml.onrender.com';
+            const res = await fetch(`${baseUrl}/user/${customerId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ frozen: freezeStatus })
+            });
+            if (!res.ok) throw new Error('Failed to update freeze status');
+            // Refresh customers list
+            const fetchCustomers = async () => {
+                try {
+                    setLoading(true);
+                    const res = await fetch(`${baseUrl}/customers`);
+                    if (!res.ok) throw new Error(`Failed to fetch customers: ${res.status}`);
+                    const data = await res.json();
+                    setCustomers(data);
+                } catch (err) {
+                    setError(err.message || 'Unknown error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            await fetchCustomers();
+        } catch (err) {
+            alert(err.message || 'Unknown error');
+        }
+    };
+
     const handleOpen = (field) => {
         setSelectedField(field);
         setOpen(true);
@@ -69,6 +98,16 @@ export function CustomerAccounts({ accountType }) {
                                         onClick={() => handleOpen(displayField)}
                                     >View Details
                                     </Button>
+                                    {accountType === 'manager' && (
+                                        <Button
+                                            variant="contained"
+                                            color={field.frozen ? 'warning' : 'error'}
+                                            sx={{ mt: 1 }}
+                                            onClick={() => handleFreezeToggle(field.customer_id, field.frozen ? 0 : 1)}
+                                        >
+                                            {field.frozen ? 'Unfreeze' : 'Freeze'}
+                                        </Button>
+                                    )}
                                 </Grid>
                             </Grid>
                         </Card>

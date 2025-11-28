@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 app.get("/user/:id", (req, res) => {
   const { id } = req.params;
   const query = `
-    SELECT first_name, last_name, email, date_of_birth, country, province, city, street, postal_code
+    SELECT first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, frozen
     FROM Customer
     WHERE customer_id = ?
   `;
@@ -300,7 +300,7 @@ app.patch('/user/:id', (req, res) => {
   const { id } = req.params;
   const allowedFields = [
     'first_name', 'last_name', 'email', 'date_of_birth',
-    'country', 'province', 'city', 'street', 'postal_code'
+    'country', 'province', 'city', 'street', 'postal_code', 'frozen'
   ];
   const updates = Object.entries(req.body)
     .filter(([key]) => allowedFields.includes(key));
@@ -508,6 +508,7 @@ app.post('/transaction', async (req, res) => {
     }
 
     // 2. For withdrawal, check sufficient funds
+    // TC-03: Reject Withdrawal When Insufficient Funds // TC-06: Reject Withdrawal When Insufficient Funds // TC-20: Reject Withdrawal When Insufficient Funds with Pending Transactions
     if (transaction_type === 'withdrawal' && account.balance < amount) {
       return res.status(400).json({ message: 'Insufficient funds.' });
     }
@@ -520,6 +521,7 @@ app.post('/transaction', async (req, res) => {
     }
 
     // 4. Insert transaction (pending=1)
+    // TC-19: Withdrawal and Deposit Transactions are Marked as Pending
     await queryAsync('INSERT INTO Transaction (amount, card_number, transaction_type, transaction_date, pending) VALUES (?, ?, ?, NOW(), 1)', [amount, card_number, transaction_type]);
 
     res.json({ success: true });
@@ -559,6 +561,7 @@ app.patch('/transaction/:id', async (req, res) => {
 
     if (action === 'accept') {
       // Update balance
+      // TC-05: Accept Transaction and Update Balance // TC-18: Multiple Sequential Deposits Update Balance Correctly
       if (tx.transaction_type === 'deposit') {
         await queryAsync('UPDATE Account SET balance = balance + ? WHERE card_number = ?', [tx.amount, tx.card_number]);
       } else if (tx.transaction_type === 'withdrawal') {
