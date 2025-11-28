@@ -82,22 +82,14 @@ export function CustomerAccounts({ accountType, searchValue }) {
                     const address = `${field.country || ''} ${field.province || ''}, ${field.city || ''} ${field.street || ''} ${field.postal_code || ''}`.replace(/ +/g, ' ').trim();
                     const displayField = {
                         ...field,
-                        labelName: "Full Name: ",
-                        valueName: fullName,
-                        labelEmail: "Email: ",
-                        valueEmail: field.email || '',
-                        labelDate: "Date of Birth: ",
-                        valueDate: field.date_of_birth || '',
-                        labelAddress: "Address: ",
-                        valueAddress: address,
                     };
                     console.log("field>>> ", field);
                     return (
                         <Card key={field.customer_id || idx} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                    <h4 style={{ textAlign: "start" }}>{displayField.labelName + displayField.valueName}</h4>
-                                    <h5 style={{ textAlign: "start" }}>{displayField.labelEmail + displayField.valueEmail}</h5>
+                                    <h4 style={{ textAlign: "start" }}>{"Full Name: " + fullName}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{"Email: " + (field.email || '')}</h5>
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
                                     <Button endIcon={<ArrowForwardIosIcon />}

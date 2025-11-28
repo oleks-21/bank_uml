@@ -60,22 +60,15 @@ export function AccountsList({ accountType, searchValue }) {
 
                     const displayField = {
                         ...field,
-                        labelNumber: 'Card Number: ',
-                        valueNumber: cardNumber,
-                        valueType: type,
-                        labelAmount: 'Amount Paid: ',
-                        valueAmount: amount,
-                        labelDate: 'Date of Payment: ',
-                        valueDate: date,
                     };
 
                     return (
                         <Card key={`${cardNumber}-${idx}`} sx={{ width: "100%", marginBottom: "2em" }}>
                             <Grid container>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
-                                    <h4 style={{ textAlign: "start" }}>{displayField.labelNumber + displayField.valueNumber}</h4>
-                                    <h5 style={{ textAlign: "start" }}>{displayField.valueType}</h5>
-                                    <p style={{ textAlign: "start" }}>{displayField.labelAmount + displayField.valueAmount}</p>
+                                    <h4 style={{ textAlign: "start" }}>{'Card Number: ' + cardNumber}</h4>
+                                    <h5 style={{ textAlign: "start" }}>{type}</h5>
+                                    <p style={{ textAlign: "start" }}>{'Amount Paid: ' + amount}</p>
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}>
                                     <Button onClick={() => handleOpen(displayField)}

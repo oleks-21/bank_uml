@@ -471,7 +471,7 @@ app.post('/transfer', async (req, res) => {
     if (!senderCustomer || !recipientCustomer) {
       return res.status(404).json({ message: 'Sender or recipient customer not found.' });
     }
-    if (senderCustomer.frozen || recipientCustomer.frozen) {
+    if (senderCustomer.frozen===1 || recipientCustomer.frozen===1) {
       return res.status(403).json({ message: 'Sender or recipient account is frozen.' });
     }
 
@@ -523,7 +523,7 @@ app.post('/transaction', async (req, res) => {
       return res.status(403).json({ message: 'Card does not belong to the current user.' });
     }
     const [customer] = await queryAsync('SELECT frozen FROM Customer WHERE customer_id = ?', [customer_id]);
-    if (customer.frozen = 1) {
+    if (customer.frozen === 1) {
       return res.status(401).json({ message: 'This account is frozen.' });
     }
     // 2. For withdrawal, check sufficient funds

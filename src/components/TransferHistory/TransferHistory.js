@@ -43,7 +43,7 @@ export function TransferHistory({ accountType, searchValue }) {
                 {filteredTransfers.map((t) => (
                     <Card key={t.transfer_id} sx={{ width: "100%", mb: 2 }}>
                         <Grid container>
-                            <Grid xs={6} sx={{ pl: 2 }}>
+                            <Grid size={{ xs: 6, sm: 6 }} sx={{ paddingLeft: "1em" }}>
                                 <h4 style={{ textAlign: "start" }}>
                                     Amount: ${t.amount}
                                 </h4>
@@ -55,8 +55,7 @@ export function TransferHistory({ accountType, searchValue }) {
                                 </h5>
                             </Grid>
                             <Grid 
-                                xs={6} 
-                                sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}
+                                size={{ xs: 6, sm: 6 }} sx={{ justifyContent: "center", alignItems: "end", display: "flex", flexDirection: "column", paddingRight: "1em" }}
                             >
                                 <Button
                                     endIcon={<ArrowForwardIosIcon />}

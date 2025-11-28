@@ -70,7 +70,7 @@ export function DetailsOverlay({ title, field, onClose, accountType, editable })
                 {Object.entries(editData).map(([key, value]) => (
                     <Grid container alignItems="center" spacing={1} key={key}>
                         <Grid item xs={5}>
-                            <Typography fullWidth variant="body2" sx={{ fontWeight: 600, width: "100px" }}>
+                            <Typography fullWidth variant="body2" sx={{ fontWeight: 600, width: "120px" }}>
                                 {formatLabel(key)}:
                             </Typography>
                         </Grid>
@@ -82,7 +82,7 @@ export function DetailsOverlay({ title, field, onClose, accountType, editable })
                                     size="small"
                                     variant="outlined"
                                     onChange={handleFieldChange(key)}
-                                    sx={{ width: "340px" }}
+                                    sx={{ width: "320px" }}
                                 />
                             ) : (
                                 <Typography variant="body2">{value}</Typography>
