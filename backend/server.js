@@ -283,6 +283,18 @@ app.get('/accounts/:customerId', (req, res) => {
   });
 });
 
+// Fetch all accounts (no filter)
+app.get('/accounts', (req, res) => {
+  const query = 'SELECT * FROM Account';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Fetch all accounts error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    res.json(results);
+  });
+});
+
 // Fetch all customer profiles
 app.get('/customers', (req, res) => {
   const query = `SELECT customer_id, first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, frozen FROM Customer`;

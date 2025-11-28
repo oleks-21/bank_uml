@@ -15,6 +15,7 @@ import { Transfer } from "../Transfer/Transfer";
 import { TransferHistory } from "../TransferHistory/TransferHistory";
 import { PendingTransfers } from "../PendingTransfers/PendingTransfers";
 import { Transaction } from "../Transaction/Transaction";
+import CardList from "../CardList/CardList";
 export function AccountPage() {
     const location = useLocation();
     const accountType = location.state?.accountType || "user";
@@ -44,6 +45,11 @@ export function AccountPage() {
                 return <>
                     <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
                     <CustomerAccounts accountType={accountType} searchValue={searchValue} />
+                </>;
+            case "Customer Cards":
+                return <>
+                    <SearchModule searchValue={searchValue} onSearchChange={handleSearchChange} />
+                    <CardList accountType={accountType} searchValue={searchValue} />
                 </>;
             case "Pending Transactions":
                 return <>
