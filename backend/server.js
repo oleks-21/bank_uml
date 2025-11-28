@@ -160,7 +160,7 @@ function isAtLeast18(dateOfBirth) {
   return age >= 18;
 }
 function passwordStrength(password) {
-  if((password.length >= 12)&&(/[A-Z]/.test(password))&&(/[a-z]/.test(password))&&(/[0-9]/.test(password))&&(/[\W_]/.test(password))){
+  if ((password.length >= 12) && (/[A-Z]/.test(password)) && (/[a-z]/.test(password)) && (/[0-9]/.test(password)) && (/[\W_]/.test(password))) {
     return true;
   }
   return false;
@@ -192,19 +192,19 @@ app.post("/register", (req, res) => {
   }
 
   //age checking
-  if(!isAtLeast18(date_of_birth)){
+  if (!isAtLeast18(date_of_birth)) {
     return res.status(403).json({
       message: "You must be at least 18 years old to create an account"
     });
   }
   //password strength checking
-  if(!passwordStrength(password)){
+  if (!passwordStrength(password)) {
     return res.status(403).json({
       message: "Your password must be at least 12 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
     });
   }
 
-  
+
   const query = `
     INSERT INTO Customer 
     (first_name, last_name, email, date_of_birth, country, province, city, street, postal_code, document_1, document_2, password, primary_card_number)
@@ -309,7 +309,13 @@ app.get('/customers', (req, res) => {
 
 // Fetch all staff profiles
 app.get('/workers', (req, res) => {
-  const query = `SELECT worker_id, first_name, last_name, email, role, date_of_birth, country, province, city, street, postal_code FROM Worker WHERE NOT role = manager`;
+  const query = `
+    SELECT 
+      worker_id, first_name, last_name, email, role, 
+      date_of_birth, country, province, city, street, postal_code 
+    FROM Worker 
+    WHERE role <> 'manager';
+  `;
   db.query(query, (err, results) => {
     if (err) {
       console.error(' Fetch workers error:', err);
@@ -482,7 +488,7 @@ app.post('/transfer', async (req, res) => {
     if (!senderCustomer || !recipientCustomer) {
       return res.status(404).json({ message: 'Sender or recipient customer not found.' });
     }
-    if (senderCustomer.frozen===1 || recipientCustomer.frozen===1) {
+    if (senderCustomer.frozen === 1 || recipientCustomer.frozen === 1) {
       return res.status(403).json({ message: 'Sender or recipient account is frozen.' });
     }
 
